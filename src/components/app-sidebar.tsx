@@ -10,7 +10,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Frame, Heart, History, Home, Map, PieChart } from 'lucide-react';
 import * as React from 'react';
@@ -31,7 +30,7 @@ const data = {
   navMain: [
     {
       title: 'Все проекты',
-      url: '#',
+      url: '/my-project',
       icon: Home,
       isActive: true,
       items: [
@@ -55,19 +54,23 @@ const data = {
       icon: Heart,
       items: [
         {
-          title: 'Сбербанк',
+          title: 'Sturiva',
           url: '#',
         },
         {
-          title: 'Ростелеком',
+          title: 'Уфа-водоканал',
           url: '#',
         },
         {
-          title: 'ВТБ',
+          title: 'Ограждения варианты с насыпным грунтом',
           url: '#',
         },
         {
-          title: 'Мегафон',
+          title: 'Грунты тест',
+          url: '#',
+        },
+        {
+          title: 'Без названия (5)',
           url: '#',
         },
       ],
@@ -78,19 +81,23 @@ const data = {
       icon: History,
       items: [
         {
-          title: 'Сбербанк',
+          title: '2224534343412',
           url: '#',
         },
         {
-          title: 'Ростелеком',
+          title: 'Газпром',
           url: '#',
         },
         {
-          title: 'ВТБ',
+          title: 'Sturiva (2)',
           url: '#',
         },
         {
-          title: 'Мегафон',
+          title: 'Sturiva',
+          url: '#',
+        },
+        {
+          title: 'Без названия (2)',
           url: '#',
         },
       ],
@@ -117,19 +124,20 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-      </SidebarHeader>
-      <SidebarSeparator className="h-1" />
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/*<NavProjects projects={data.projects} />*/}
-      </SidebarContent>
-      <SidebarSeparator className="h-1" />
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
+    <Sidebar collapsible="icon" className="w-[236px]" {...props}>
+      <div className="flex flex-col h-full bg-bg-surface2  gap-0.5 group-data-[collapsible=icon]:gap-0.5">
+        <SidebarHeader className="pr-2.5 py-2.5 bg-bg-surface1 rounded inline-flex justify-start items-center overflow-hidden">
+          <TeamSwitcher teams={data.teams} />
+        </SidebarHeader>
+
+        <SidebarContent className="flex-1 bg-bg-surface1 rounded p-2 gap-1.5 overflow-hidden">
+          <NavMain items={data.navMain} />
+        </SidebarContent>
+
+        <SidebarFooter className="bg-bg-surface1 rounded p-2.5 mt-0">
+          <NavUser user={data.user} />
+        </SidebarFooter>
+      </div>
       <SidebarRail />
     </Sidebar>
   );

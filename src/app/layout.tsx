@@ -8,10 +8,12 @@ import './globals.css';
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: ' Калькулятор расчета',
+  title: 'Калькулятор расчета',
   description: 'Калькулятор расчета',
 };
 
@@ -25,13 +27,17 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <SidebarProvider>
-            <AppSidebar />
-            {children}
+            <div className="flex h-screen w-full bg-bg-surface2 p-2.5">
+              <AppSidebar />
+              <div className="flex-1 flex flex-col min-w-0 overflow-auto">
+                {children}
+              </div>
+            </div>
           </SidebarProvider>
         </ThemeProvider>
       </body>

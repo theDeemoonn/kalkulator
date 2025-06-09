@@ -243,7 +243,7 @@ export function TypographyDescriptionL({
   return (
     <span
       className={cn(
-        'text-[12px] leading-[140%] tracking-[0em] font-normal text-muted-foreground',
+        'text-[12px] leading-[140%] tracking-[0em] font-normal text-fg-soft',
         className
       )}
       {...props}
@@ -261,7 +261,7 @@ export function TypographyDescriptionM({
   return (
     <span
       className={cn(
-        'text-[10px] leading-[140%] tracking-[0em] font-normal text-muted-foreground',
+        'text-[10px] leading-[140%] tracking-[0em] font-normal text-fg-soft',
         className
       )}
       {...props}
@@ -297,7 +297,7 @@ export function TypographyBlockquote({
   return (
     <blockquote
       className={cn(
-        'mt-6 border-l-2 border-slate-300 pl-6 italic text-[16px] leading-[140%]',
+        'mt-6 border-l-2 border-border-soft pl-6 italic text-[16px] leading-[140%]',
         className
       )}
       {...props}
@@ -315,7 +315,7 @@ export function TypographyInlineCode({
   return (
     <code
       className={cn(
-        'relative rounded bg-muted px-[0.3rem] py-[0.2rem] text-[14px] font-mono font-semibold',
+        'relative rounded bg-bg-surface3 px-[0.3rem] py-[0.2rem] text-[14px] font-mono font-semibold',
         className
       )}
       {...props}
@@ -333,7 +333,7 @@ export function TypographyLead({
   return (
     <p
       className={cn(
-        'text-[20px] leading-[140%] tracking-[-0.01em] text-muted-foreground',
+        'text-[20px] leading-[140%] tracking-[-0.01em] text-fg-soft',
         className
       )}
       {...props}
@@ -366,7 +366,7 @@ export function TypographySmall({
   return (
     <small
       className={cn(
-        'text-[12px] leading-[140%] font-medium text-muted-foreground',
+        'text-[12px] leading-[140%] font-medium text-fg-soft',
         className
       )}
       {...props}
@@ -383,10 +383,7 @@ export function TypographyMuted({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn(
-        'text-[14px] leading-[140%] text-muted-foreground',
-        className
-      )}
+      className={cn('text-[14px] leading-[140%] text-fg-soft', className)}
       {...props}
     >
       {children}

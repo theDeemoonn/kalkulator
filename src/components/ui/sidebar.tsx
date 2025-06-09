@@ -1,5 +1,6 @@
 'use client';
 
+import AlignLeft from '@/components/icon/align-left';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -22,7 +23,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, VariantProps } from 'class-variance-authority';
-import { ArrowLeftToLine } from 'lucide-react';
 import * as React from 'react';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
@@ -229,7 +229,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          'fixed top-1 bottom-1 h-[calc(100vh-0.5rem)] z-10 hidden  w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
+          'fixed top-2.5 bottom-2.5 h-[calc(100vh-1.25rem)] z-10 hidden  w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
           side === 'left'
             ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
             : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
@@ -276,7 +276,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <ArrowLeftToLine />
+      <AlignLeft />
     </Button>
   );
 }

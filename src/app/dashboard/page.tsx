@@ -1,8 +1,13 @@
 'use client';
+import {
+  PageContainer,
+  PageContent,
+  PageHeader,
+} from '@/components/page-container';
 import { TypographyBodyM, TypographyMuted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { InputWithSlider } from '@/components/ui/input-with-slider';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -14,14 +19,6 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset } from '@/components/ui/sidebar';
 import { Switch } from '@/components/ui/switch';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Check, Edit2, Plus, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
@@ -53,6 +50,7 @@ function DashboardPage() {
   ]);
   const [activeTab, setActiveTab] = useState<string>('1');
   const [editingValue, setEditingValue] = useState<string>('');
+  const [value, setValue] = useState(200);
 
   // Состояние для редактирования заголовка проекта
   const [projectTitle, setProjectTitle] = useState<string>('Hydroweb');
@@ -104,13 +102,33 @@ function DashboardPage() {
   ]);
 
   // Состояние для параметров котлована
-  const [excavationParams, setExcavationParams] = useState({
-    groundwaterLevel: '200',
-    slopeAngle: '89',
-    depth: '10',
-    length: '13',
-    embedmentDepth: '15',
-  });
+  const [groundwaterLevel, setGroundwaterLevel] = useState(200);
+  const [slopeAngle, setSlopeAngle] = useState(89);
+  const [pitDepth, setPitDepth] = useState(10);
+  const [fenceLength, setFenceLength] = useState(13);
+  const [embedmentDepth, setEmbedmentDepth] = useState(15);
+
+  // Массив вариантов грунта
+  const soilTypes = [
+    'Песок гравелистый',
+    'Грунт 5',
+    'Грунт 7',
+    'Грунт 8',
+    'Грунт 9',
+  ];
+
+  // Массив полей для таблицы с корректным типом
+  const soilFields: (keyof SoilLayer)[] = [
+    'h',
+    'h2',
+    'z2',
+    'gamma',
+    'gammaSat',
+    'ks',
+    'c',
+    'phi',
+    'v',
+  ];
 
   // Функции для редактирования заголовка проекта
   const startEditingTitle = () => {
@@ -236,11 +254,19 @@ function DashboardPage() {
     setEditingValue('');
   };
 
+  const handleChange = (newValue: number) => {
+    setValue(newValue);
+  };
+
+  const handleInfoClick = () => {
+    alert('Показать справку или дополнительную информацию');
+  };
+
   return (
     <SidebarInset>
-      <Card className="flex flex-col flex-1 overflow-hidden m-1 py-4 gap-4">
+      <PageContainer className="p-0">
         {/* Header с табами */}
-        <CardHeader className="flex h-16 shrink-0 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 pb-0">
+        <PageHeader>
           <div className="flex items-center gap-2 flex-1">
             <Tabs
               value={activeTab}
@@ -332,11 +358,9 @@ function DashboardPage() {
               </div>
             </Tabs>
           </div>
-        </CardHeader>
+        </PageHeader>
 
-        <Separator className={'h-px'} />
-
-        <CardContent className="flex-1 space-y-0 p-0">
+        <PageContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {tabs.map((tab) => (
               <TabsContent
@@ -397,6 +421,9 @@ function DashboardPage() {
                   <TypographyMuted className="text-muted-foreground">
                     Обновлено 25.12.2024 16:48
                   </TypographyMuted>
+                </div>
+                <Separator className={'h-px'} />
+                <div className="p-6 space-y-6">
                   <div className="flex items-center">
                     <Button
                       variant="ghost"
@@ -415,7 +442,7 @@ function DashboardPage() {
                 <Separator className={'h-px'} />
 
                 {/* Параметры расчета */}
-                <div className="p-6 space-y-6">
+                <div className="p-6 pt-10.5 space-y-6">
                   <div className="space-y-2">
                     <h2 className="text-xl font-semibold">Параметры расчета</h2>
                   </div>
@@ -589,268 +616,155 @@ function DashboardPage() {
                 </div>
 
                 {/* Характеристики грунтов */}
-                <div className="p-6 space-y-6">
-                  <div className="space-y-2">
-                    <h2 className="text-xl font-semibold">
-                      Характеристики грунтов
-                    </h2>
+                <div className="px-6 flex flex-col gap-6">
+                  <div className="text-xl font-bold">
+                    Характеристики грунтов
                   </div>
-
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-center">ИГЭ</TableHead>
-                          <TableHead className="text-center">Грунт</TableHead>
-                          <TableHead className="text-center">
-                            h<br />
-                            <span className="text-xs text-muted-foreground">
-                              м
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            H2
-                            <br />
-                            <span className="text-xs text-muted-foreground">
-                              м
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            Z2
-                            <br />
-                            <span className="text-xs text-muted-foreground">
-                              м
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            γ<br />
-                            <span className="text-xs text-muted-foreground">
-                              кН/м³
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            γ sat
-                            <br />
-                            <span className="text-xs text-muted-foreground">
-                              кН/м³
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            ks
-                            <br />
-                            <span className="text-xs text-muted-foreground">
-                              кН/м³
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            c<br />
-                            <span className="text-xs text-muted-foreground">
-                              кПа
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            φ<br />
-                            <span className="text-xs text-muted-foreground">
-                              °
-                            </span>
-                          </TableHead>
-                          <TableHead className="text-center">v</TableHead>
-                          <TableHead></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {soilLayers.map((layer) => (
-                          <TableRow key={layer.id}>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.ige}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'ige',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.type}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'type',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-32 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.h}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'h',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.h2}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'h2',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.z2}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'z2',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.gamma}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'gamma',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.gammaSat}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'gammaSat',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.ks}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'ks',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.c}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'c',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.phi}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'phi',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-center">
-                                <Input
-                                  value={layer.v}
-                                  onChange={(e) =>
-                                    updateSoilLayer(
-                                      layer.id,
-                                      'v',
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 h-8 text-end"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeSoilLayer(layer.id)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
+                  <div className="rounded-lg overflow-x-auto max-w-full">
+                    <div className="w-full">
+                      {/* Заголовок */}
+                      <div className="flex bg-bg-surface2">
+                        <div className="w-[74px] h-12 flex items-center justify-end px-2.5">
+                          <span className="text-fg-default text-sm font-medium text-end">
+                            ИГЭ
+                          </span>
+                        </div>
+                        <div className="w-[250px] h-12 flex items-center justify-end px-2.5">
+                          <span className="text-fg-default text-sm font-medium text-left">
+                            Грунт
+                          </span>
+                        </div>
+                        {[
+                          'h',
+                          'H2',
+                          'Z2',
+                          'γ',
+                          'γ sat',
+                          'ks',
+                          'c',
+                          'φ',
+                          'v',
+                        ].map((col) => (
+                          <div
+                            key={col}
+                            className="w-[74px] h-12 flex flex-col justify-center items-end px-2.5"
+                          >
+                            <div className="inline-flex items-center gap-0.5 w-full justify-end">
+                              <span className="text-fg-default text-sm font-medium text-end">
+                                {col}
+                              </span>
+                            </div>
+                            <div className="inline-flex items-center gap-1.5 w-full justify-end">
+                              {['h', 'H2', 'Z2'].includes(col) && (
+                                <TypographyMuted>м</TypographyMuted>
+                              )}
+                              {(col === 'γ' ||
+                                col === 'γ sat' ||
+                                col === 'ks') && (
+                                <TypographyMuted>кН/м³</TypographyMuted>
+                              )}
+                              {col === 'v' && (
+                                <TypographyMuted>
+                                  <br />
+                                </TypographyMuted>
+                              )}
+                              {col === 'c' && (
+                                <TypographyMuted>кПа</TypographyMuted>
+                              )}
+                              {col === 'φ' && (
+                                <TypographyMuted>°</TypographyMuted>
+                              )}
+                            </div>
+                          </div>
                         ))}
-                      </TableBody>
-                    </Table>
+                        <div className="w-12 h-12 flex items-center justify-center" />
+                      </div>
+                      {/* Строки */}
+                      {soilLayers.map((layer, idx) => (
+                        <div
+                          key={layer.id}
+                          className={`flex ${idx % 2 ? 'bg-bg-surface2' : 'bg-bg-surface1'}`}
+                        >
+                          {/* ИГЭ */}
+                          <div className="w-[74px] h-12 flex items-center justify-end px-2.5">
+                            <Input
+                              value={layer.ige}
+                              onChange={(e) =>
+                                updateSoilLayer(layer.id, 'ige', e.target.value)
+                              }
+                              className="w-full h-8 text-end bg-transparent border-none shadow-none focus:ring-0 focus:outline-none"
+                            />
+                          </div>
+                          {/* Грунт */}
+                          <div className="w-[250px] h-12 flex items-center px-2.5">
+                            <Select
+                              value={layer.type}
+                              onValueChange={(value) =>
+                                updateSoilLayer(layer.id, 'type', value)
+                              }
+                            >
+                              <SelectTrigger className="w-full h-8 bg-bg-surface1 border border-border-soft rounded-sm px-2 text-sm font-medium text-left">
+                                <SelectValue placeholder="Выберите грунт" />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-40 overflow-y-auto bg-bg-surface1 rounded-sm shadow-lg">
+                                {soilTypes.map((type) => (
+                                  <SelectItem
+                                    key={type}
+                                    value={type}
+                                    className="p-1.5 text-xs font-medium rounded-sm data-[state=checked]:bg-accent-default data-[state=checked]:text-accent-on-accent text-left"
+                                  >
+                                    {type}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          {/* Остальные ячейки */}
+                          {soilFields.map((field) => (
+                            <div
+                              key={field}
+                              className="w-[74px] h-12 flex items-center justify-end"
+                            >
+                              <Input
+                                value={layer[field]}
+                                onChange={(e) =>
+                                  updateSoilLayer(
+                                    layer.id,
+                                    field,
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full h-8 text-end bg-transparent border-none shadow-none focus:ring-0 focus:outline-none"
+                              />
+                            </div>
+                          ))}
+                          {/* Кнопка удалить */}
+                          <div className="w-12 h-12 flex items-center justify-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeSoilLayer(layer.id)}
+                              className="text-destructive hover:text-destructive"
+                              aria-label="Удалить грунт"
+                              tabIndex={0}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <Button
                     variant="outline"
                     size="full"
-                    className="mt-4"
+                    className="mt-4 flex gap-2 justify-center items-center"
                     onClick={addSoilLayer}
-                    leftIcon={<Plus className="h-4 w-4 mr-2" />}
+                    aria-label="Добавить грунт"
+                    tabIndex={0}
+                    leftIcon={<Plus className="h-5 w-5 text-accent-default" />}
                   >
-                    <TypographyBodyM className="text-[var(--foreground-default)]">
-                      Добавить грунт
-                    </TypographyBodyM>
+                    <span>Добавить грунт</span>
                   </Button>
                 </div>
 
@@ -861,105 +775,66 @@ function DashboardPage() {
                       Параметры котлована
                     </h2>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="space-y-2">
-                      <Label>
-                        h<sub>w</sub> Уровень грунтовых вод
-                      </Label>
-                      <div className="space-y-2">
-                        <Input
-                          value={excavationParams.groundwaterLevel}
-                          onChange={(e) =>
-                            setExcavationParams((prev) => ({
-                              ...prev,
-                              groundwaterLevel: e.target.value,
-                            }))
-                          }
-                        />
-                        <div className="text-xs text-muted-foreground">
-                          200 м
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>β Угол наклона поверхности грунта</Label>
-                      <div className="space-y-2">
-                        <Input
-                          value={excavationParams.slopeAngle}
-                          onChange={(e) =>
-                            setExcavationParams((prev) => ({
-                              ...prev,
-                              slopeAngle: e.target.value,
-                            }))
-                          }
-                        />
-                        <div className="text-xs text-muted-foreground">
-                          89 °
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>H Глубина котлована</Label>
-                      <div className="space-y-2">
-                        <Input
-                          value={excavationParams.depth}
-                          onChange={(e) =>
-                            setExcavationParams((prev) => ({
-                              ...prev,
-                              depth: e.target.value,
-                            }))
-                          }
-                        />
-                        <div className="text-xs text-muted-foreground">
-                          10 м
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>L Длина ограждения</Label>
-                      <div className="space-y-2">
-                        <Input
-                          value={excavationParams.length}
-                          onChange={(e) =>
-                            setExcavationParams((prev) => ({
-                              ...prev,
-                              length: e.target.value,
-                            }))
-                          }
-                        />
-                        <div className="text-xs text-muted-foreground">
-                          13 м
-                        </div>
-                      </div>
-                    </div>
+                    <InputWithSlider
+                      measure="h"
+                      title="Уровень грунтовых вод"
+                      value={groundwaterLevel}
+                      unit="м"
+                      min={0}
+                      max={500}
+                      onChange={setGroundwaterLevel}
+                      onInfoClick={handleInfoClick}
+                    />
+                    <InputWithSlider
+                      measure="β"
+                      title="Угол наклона поверхности грунта"
+                      value={slopeAngle}
+                      unit="°"
+                      min={0}
+                      max={90}
+                      onChange={setSlopeAngle}
+                      onInfoClick={handleInfoClick}
+                    />
+                    <InputWithSlider
+                      measure="H"
+                      title="Глубина котлована"
+                      value={pitDepth}
+                      unit="м"
+                      min={0}
+                      max={100}
+                      onChange={setPitDepth}
+                      onInfoClick={handleInfoClick}
+                    />
+                    <InputWithSlider
+                      measure="L"
+                      title="Длина ограждения"
+                      value={fenceLength}
+                      unit="м"
+                      min={0}
+                      max={100}
+                      onChange={setFenceLength}
+                      onInfoClick={handleInfoClick}
+                    />
                   </div>
-
-                  <div className="mt-6 space-y-2">
-                    <Label>Глубина заделки</Label>
-                    <div className="space-y-2">
-                      <Input
-                        value={excavationParams.embedmentDepth}
-                        onChange={(e) =>
-                          setExcavationParams((prev) => ({
-                            ...prev,
-                            embedmentDepth: e.target.value,
-                          }))
-                        }
-                        className="w-32"
-                      />
-                      <div className="text-xs text-muted-foreground">15 м</div>
-                    </div>
+                  <div className="mt-6 max-w-xs">
+                    <InputWithSlider
+                      measure=""
+                      title="Глубина заделки"
+                      value={embedmentDepth}
+                      unit="м"
+                      min={0}
+                      max={100}
+                      onChange={setEmbedmentDepth}
+                      onInfoClick={handleInfoClick}
+                    />
                   </div>
                 </div>
               </TabsContent>
             ))}
           </Tabs>
-        </CardContent>
-      </Card>
+        </PageContent>
+      </PageContainer>
     </SidebarInset>
   );
 }
