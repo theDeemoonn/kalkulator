@@ -50,7 +50,6 @@ function DashboardPage() {
   ]);
   const [activeTab, setActiveTab] = useState<string>('1');
   const [editingValue, setEditingValue] = useState<string>('');
-  const [value, setValue] = useState(200);
 
   // Состояние для редактирования заголовка проекта
   const [projectTitle, setProjectTitle] = useState<string>('Hydroweb');
@@ -252,10 +251,6 @@ function DashboardPage() {
       tabs.map((tab) => (tab.id === tabId ? { ...tab, isEditing: false } : tab))
     );
     setEditingValue('');
-  };
-
-  const handleChange = (newValue: number) => {
-    setValue(newValue);
   };
 
   const handleInfoClick = () => {

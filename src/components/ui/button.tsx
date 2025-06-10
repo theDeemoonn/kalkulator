@@ -58,7 +58,7 @@ function Button({
   const effectiveSize = isIconOnly ? 'icon' : size;
 
   // Функция для рендеринга иконки с правильными размерами
-  const renderIcon = (icon: React.ReactNode, position: 'left' | 'right') => {
+  const renderIcon = (icon: React.ReactNode) => {
     if (!icon) return null;
 
     if (React.isValidElement(icon)) {
@@ -82,9 +82,9 @@ function Button({
     children
   ) : (
     <>
-      {leftIcon && renderIcon(leftIcon, 'left')}
+      {leftIcon && renderIcon(leftIcon)}
       {children && <span className="truncate">{children}</span>}
-      {rightIcon && renderIcon(rightIcon, 'right')}
+      {rightIcon && renderIcon(rightIcon)}
     </>
   );
 
