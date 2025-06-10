@@ -1,11 +1,7 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-bg-surface2 p-2.5">
@@ -16,4 +12,4 @@ export default function AppLayout({
       </div>
     </SidebarProvider>
   );
-} 
+}
