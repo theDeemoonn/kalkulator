@@ -69,7 +69,7 @@ function Button({
       return React.cloneElement(iconElement, {
         className: cn(
           'shrink-0',
-          effectiveSize === 'icon' ? 'size-4' : 'size-4',
+          effectiveSize === 'icon' ? 'size-5' : 'size-5',
           existingClassName
         ),
       });

@@ -8,8 +8,8 @@ function Input({
   suffix,
   ...props
 }: React.ComponentProps<'input'> & {
-  prefix?: string;
-  suffix?: string;
+  prefix?: string | React.ReactNode;
+  suffix?: string | React.ReactNode;
 }) {
   if (prefix || suffix) {
     return (

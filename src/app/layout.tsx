@@ -1,6 +1,4 @@
-import { AppSidebar } from '@/components/app-sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -31,14 +29,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <div className="flex h-screen w-full bg-bg-surface2 p-2.5">
-              <AppSidebar />
-              <div className="flex-1 flex flex-col min-w-0 overflow-auto">
-                {children}
-              </div>
-            </div>
-          </SidebarProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>
