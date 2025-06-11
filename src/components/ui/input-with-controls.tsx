@@ -111,7 +111,7 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
       aria-label="Информация"
       onClick={onInfoClick}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onInfoClick?.()}
-      className="relative pr-[7px] outline-none focus-visible:ring-2 focus-visible:ring-accent-default rounded"
+      className="relative outline-none focus-visible:ring-2 focus-visible:ring-accent-default rounded"
       role="button"
     >
       <InfoSquare className="w-4 h-4" />
@@ -217,9 +217,9 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
   }
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-2', styles.container, className)}>
       {label && (
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <Label className="leading-none h-[18px] flex items-center">
             <TypographyBodyS className="text-fg-soft">{label}</TypographyBodyS>
           </Label>
@@ -246,9 +246,9 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
         </div>
       </div>
 
-      {/* Слайдер для простого режима */}
+      {/* Слайдер для простого режима - исправлена ширина */}
       {showSlider && type === 'number' && (
-        <div className="relative left-0 right-0 bottom-4 w-full px-2.5 flex items-center h-3.5">
+        <div className="relative  left-0 right-0 bottom-4 w-full px-2.5 flex items-center h-3.5">
           <Slider
             min={min}
             max={max}
@@ -256,7 +256,7 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
             value={[Number(value)]}
             onValueChange={handleSliderChange}
             disabled={disabled}
-            className="flex-1 h-0.5 bg-border-hard2"
+            className="w-full h-0.5 bg-border-hard2"
           />
         </div>
       )}
