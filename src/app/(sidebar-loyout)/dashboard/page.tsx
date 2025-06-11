@@ -494,7 +494,7 @@ function DashboardPage() {
                     )}
 
                     {!isEditingTitle && (
-                      <div className="flex gap-2 flex-col">
+                      <div className="flex gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
