@@ -1,4 +1,6 @@
 'use client';
+import Edit from '@/components/icon/edit';
+import Trash from '@/components/icon/trash';
 import {
   PageContainer,
   PageContent,
@@ -7,7 +9,7 @@ import {
 import { TypographyBodyM, TypographyMuted } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { InputWithSlider } from '@/components/ui/input-with-slider';
+import { InputWithControls } from '@/components/ui/input-with-controls';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -20,7 +22,14 @@ import { Separator } from '@/components/ui/separator';
 import { SidebarInset } from '@/components/ui/sidebar';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Check, Edit2, Plus, Trash2, X } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Check, Plus, X } from 'lucide-react';
+import * as React from 'react';
 import { useState } from 'react';
 
 interface Tab {
@@ -101,11 +110,19 @@ function DashboardPage() {
   ]);
 
   // Состояние для параметров котлована
-  const [groundwaterLevel, setGroundwaterLevel] = useState(200);
-  const [slopeAngle, setSlopeAngle] = useState(89);
-  const [pitDepth, setPitDepth] = useState(10);
-  const [fenceLength, setFenceLength] = useState(13);
-  const [embedmentDepth, setEmbedmentDepth] = useState(15);
+  const [groundwaterLevel, setGroundwaterLevel] = useState(0);
+  const [slopeAngle, setSlopeAngle] = useState(0);
+  const [pitDepth, setPitDepth] = useState(0);
+  const [fenceLength, setFenceLength] = useState(0);
+  const [embedmentDepth, setEmbedmentDepth] = useState(0);
+
+  // Состояние для drag and drop
+  const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const [dropIndicator, setDropIndicator] = useState<{
+    targetId: string;
+    position: 'above' | 'below';
+  } | null>(null);
 
   // Массив вариантов грунта
   const soilTypes = [
@@ -128,6 +145,21 @@ function DashboardPage() {
     'phi',
     'v',
   ];
+
+  // Маппинг колонок к их описаниям для тултипов
+  const columnTooltips: { [key: string]: string } = {
+    ИГЭ: 'Инженерно-геологический элемент',
+    Грунт: 'Наименование слоя',
+    h: 'Толщина слоя',
+    H2: 'Относительная отметка подошвы слоя',
+    Z2: 'Абсолютная отметка подошвы слоя',
+    γ: 'Удельный вес грунта',
+    'γ sat': 'Удельный вес грунта при полном водонасыщении',
+    ks: 'Коэффициент постели',
+    c: 'Удельное сцепление грунта',
+    φ: 'Угол внутреннего трения грунта',
+    v: 'Коэффициент Пуассона',
+  };
 
   // Функции для редактирования заголовка проекта
   const startEditingTitle = () => {
@@ -210,6 +242,69 @@ function DashboardPage() {
 
   const removeSoilLayer = (id: string) => {
     setSoilLayers(soilLayers.filter((layer) => layer.id !== id));
+  };
+
+  // Функции для drag and drop
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedItem(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+
+    if (!draggedItem || draggedItem === targetId) return;
+
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const position = e.clientY < midY ? 'above' : 'below';
+
+    setDropIndicator({ targetId, position });
+  };
+
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+
+    if (!draggedItem || draggedItem === targetId) {
+      setDraggedItem(null);
+      setDropIndicator(null);
+      return;
+    }
+
+    const draggedIndex = soilLayers.findIndex(
+      (layer) => layer.id === draggedItem
+    );
+    const targetIndex = soilLayers.findIndex((layer) => layer.id === targetId);
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedItem(null);
+      setDropIndicator(null);
+      return;
+    }
+
+    const newLayers = [...soilLayers];
+    const [draggedLayer] = newLayers.splice(draggedIndex, 1);
+
+    // Определяем позицию вставки на основе индикатора
+    let insertIndex = targetIndex;
+    if (dropIndicator?.position === 'below') {
+      insertIndex = targetIndex + 1;
+    }
+    if (draggedIndex < targetIndex && dropIndicator?.position === 'above') {
+      insertIndex = targetIndex - 1;
+    }
+
+    newLayers.splice(insertIndex, 0, draggedLayer);
+
+    setSoilLayers(newLayers);
+    setDraggedItem(null);
+    setDropIndicator(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDropIndicator(null);
   };
 
   const updateSoilLayer = (
@@ -320,7 +415,7 @@ function DashboardPage() {
                                 startEditing(tab.id, tab.name);
                               }}
                             >
-                              <Edit2 className="h-3 w-3" />
+                              <Edit className="h-3 w-3" />
                             </Button>
                             {tabs.length > 1 && (
                               <Button
@@ -346,7 +441,9 @@ function DashboardPage() {
                   size="default"
                   variant="outline"
                   onClick={addNewTab}
-                  leftIcon={<Plus className="h-4 w-4 mr-1" />}
+                  leftIcon={
+                    <Plus className="h-4 w-4 mr-1 text-accent-default" />
+                  }
                 >
                   Добавить расчет
                 </Button>
@@ -397,17 +494,21 @@ function DashboardPage() {
                     )}
 
                     {!isEditingTitle && (
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-col">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={startEditingTitle}
-                          className="hover:bg-blue-50 hover:text-blue-600"
+                          className="bg-bg-surface2"
                         >
-                          <Edit2 className="h-4 w-4" />
+                          <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="bg-bg-surface2"
+                        >
+                          <Trash className="h-4 w-4" />
                         </Button>
                       </div>
                     )}
@@ -455,7 +556,7 @@ function DashboardPage() {
                           }))
                         }
                       >
-                        <SelectTrigger className="w-56">
+                        <SelectTrigger className="w-56 data-[placeholder]:text-black">
                           <SelectValue placeholder="Нормально уплотненный" />
                         </SelectTrigger>
                         <SelectContent>
@@ -479,7 +580,7 @@ function DashboardPage() {
                           }))
                         }
                       >
-                        <SelectTrigger className="w-56">
+                        <SelectTrigger className="w-56 data-[placeholder]:text-black">
                           <SelectValue placeholder="СП 22.13330.2016" />
                         </SelectTrigger>
                         <SelectContent>
@@ -500,7 +601,7 @@ function DashboardPage() {
                           }))
                         }
                       >
-                        <SelectTrigger className="w-56">
+                        <SelectTrigger className="w-56 data-[placeholder]:text-black">
                           <SelectValue placeholder="Свободная" />
                         </SelectTrigger>
                         <SelectContent>
@@ -521,7 +622,7 @@ function DashboardPage() {
                           }))
                         }
                       >
-                        <SelectTrigger className="w-56">
+                        <SelectTrigger className="w-56 data-[placeholder]:text-black">
                           <SelectValue placeholder="По удельному весу" />
                         </SelectTrigger>
                         <SelectContent>
@@ -536,60 +637,73 @@ function DashboardPage() {
 
                   {/* Вторая строка с числовыми полями */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <Label>Отметка верха геологии</Label>
-                      <div className="flex gap-2">
-                        <div className="flex items-center gap-1">
-                          <Input
-                            value={calculationParams.topMark.a}
-                            onChange={(e) =>
-                              setCalculationParams((prev) => ({
-                                ...prev,
-                                topMark: { ...prev.topMark, a: e.target.value },
-                              }))
-                            }
-                            className="w-56"
-                            prefix={'A'}
-                            suffix={'м'}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Кол-во узлов расчетной схемы</Label>
-                      <div className="flex items-center gap-1">
-                        <Input
-                          value={calculationParams.nodesCount}
-                          onChange={(e) =>
-                            setCalculationParams((prev) => ({
-                              ...prev,
-                              nodesCount: e.target.value,
-                            }))
-                          }
-                          className="w-56"
-                          prefix={'n'}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Доля от бытового давления</Label>
-                      <div className="flex items-center gap-1">
-                        <Input
-                          value={calculationParams.pressureRatio}
-                          onChange={(e) =>
-                            setCalculationParams((prev) => ({
-                              ...prev,
-                              pressureRatio: e.target.value,
-                            }))
-                          }
-                          className="w-56"
-                          prefix={'d₀'}
-                          suffix={'%'}
-                        />
-                      </div>
-                    </div>
+                    <InputWithControls
+                      label="Отметка верха геологии"
+                      value={calculationParams.topMark.a}
+                      onChange={(value) =>
+                        setCalculationParams((prev) => ({
+                          ...prev,
+                          topMark: { ...prev.topMark, a: String(value) },
+                        }))
+                      }
+                      prefix="A"
+                      suffix="м"
+                      showInfoButton={true}
+                      onInfoClick={() => {
+                        console.log(
+                          'Показать информацию о отметке верха геологии'
+                        );
+                      }}
+                      showSlider={false}
+                      size="md"
+                      type="text"
+                      aria-label="Отметка верха геологии"
+                    />
+                    <InputWithControls
+                      label="Кол-во узлов расчетной схемы"
+                      value={Number(calculationParams.nodesCount) || 1}
+                      onChange={(value) =>
+                        setCalculationParams((prev) => ({
+                          ...prev,
+                          nodesCount: String(value),
+                        }))
+                      }
+                      prefix="n"
+                      showInfoButton={false}
+                      onInfoClick={() => {
+                        console.log('Информация о количестве узлов');
+                      }}
+                      showSlider={true}
+                      min={1}
+                      max={100}
+                      step={1}
+                      size="md"
+                      type="number"
+                      aria-label="Количество узлов расчетной схемы"
+                    />
+                    <InputWithControls
+                      label="Доля от бытового давления"
+                      value={Number(calculationParams.pressureRatio) || 0}
+                      onChange={(value) =>
+                        setCalculationParams((prev) => ({
+                          ...prev,
+                          pressureRatio: String(value),
+                        }))
+                      }
+                      prefix="d₀"
+                      suffix="%"
+                      showInfoButton={false}
+                      onInfoClick={() => {
+                        console.log('Информация о доле от бытового давления');
+                      }}
+                      showSlider={true}
+                      min={0}
+                      max={100}
+                      step={1}
+                      size="md"
+                      type="number"
+                      aria-label="Доля от бытового давления"
+                    />{' '}
                   </div>
 
                   {/* Чекбокс */}
@@ -611,157 +725,277 @@ function DashboardPage() {
                 </div>
 
                 {/* Характеристики грунтов */}
-                <div className="px-6 flex flex-col gap-6">
-                  <div className="text-xl font-bold">
-                    Характеристики грунтов
-                  </div>
-                  <div className="rounded-lg overflow-x-auto max-w-full">
-                    <div className="w-full">
-                      {/* Заголовок */}
-                      <div className="flex bg-bg-surface2">
-                        <div className="w-[74px] h-12 flex items-center justify-end px-2.5">
-                          <span className="text-fg-default text-sm font-medium text-end">
-                            ИГЭ
-                          </span>
-                        </div>
-                        <div className="w-[250px] h-12 flex items-center justify-end px-2.5">
-                          <span className="text-fg-default text-sm font-medium text-left">
-                            Грунт
-                          </span>
-                        </div>
-                        {[
-                          'h',
-                          'H2',
-                          'Z2',
-                          'γ',
-                          'γ sat',
-                          'ks',
-                          'c',
-                          'φ',
-                          'v',
-                        ].map((col) => (
-                          <div
-                            key={col}
-                            className="w-[74px] h-12 flex flex-col justify-center items-end px-2.5"
-                          >
-                            <div className="inline-flex items-center gap-0.5 w-full justify-end">
-                              <span className="text-fg-default text-sm font-medium text-end">
-                                {col}
-                              </span>
+                <TooltipProvider>
+                  <div className="px-6 flex flex-col gap-6">
+                    <div className="text-xl font-bold">
+                      Характеристики грунтов
+                    </div>
+                    <div className="rounded-lg overflow-x-auto max-w-full relative">
+                      <div className="w-full" style={{ paddingLeft: '36px' }}>
+                        {/* Заголовок */}
+                        <div className="flex bg-bg-surface2 rounded-t-lg">
+                          {/* ИГЭ */}
+                          <div className="w-[74px] min-h-12 py-1 flex flex-col">
+                            <div className="self-stretch h-full px-2.5 border-r border-border-hard2 flex flex-col justify-center items-start overflow-hidden">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="text-fg-default text-sm font-medium leading-tight cursor-help">
+                                    ИГЭ
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{columnTooltips['ИГЭ']}</p>
+                                </TooltipContent>
+                              </Tooltip>
                             </div>
-                            <div className="inline-flex items-center gap-1.5 w-full justify-end">
-                              {['h', 'H2', 'Z2'].includes(col) && (
-                                <TypographyMuted>м</TypographyMuted>
-                              )}
-                              {(col === 'γ' ||
-                                col === 'γ sat' ||
-                                col === 'ks') && (
-                                <TypographyMuted>кН/м³</TypographyMuted>
-                              )}
-                              {col === 'v' && (
-                                <TypographyMuted>
-                                  <br />
-                                </TypographyMuted>
-                              )}
-                              {col === 'c' && (
-                                <TypographyMuted>кПа</TypographyMuted>
-                              )}
-                              {col === 'φ' && (
-                                <TypographyMuted>°</TypographyMuted>
-                              )}
+                          </div>
+                          {/* Грунт */}
+                          <div className="w-[250px] min-h-12 py-1 flex flex-col">
+                            <div className="self-stretch h-full px-2.5 border-r border-border-hard2 flex flex-col justify-center items-start overflow-hidden">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="text-fg-default text-sm font-medium leading-tight cursor-help">
+                                    Грунт
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{columnTooltips['Грунт']}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          </div>
+
+                          {[
+                            'h',
+                            'H2',
+                            'Z2',
+                            'γ',
+                            'γ sat',
+                            'ks',
+                            'c',
+                            'φ',
+                            'v',
+                          ].map((col) => (
+                            <div
+                              key={col}
+                              className="w-[74px] min-h-12 py-1 flex flex-col"
+                            >
+                              <div className="self-stretch h-full px-2.5 border-r border-border-hard2 flex flex-col justify-center items-start overflow-hidden">
+                                <div className="inline-flex justify-start items-center gap-0.5">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="text-fg-default text-sm font-medium leading-tight cursor-help">
+                                        {col}
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>{columnTooltips[col]}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                                <div className="inline-flex justify-start items-center gap-1.5">
+                                  {['h', 'H2', 'Z2'].includes(col) && (
+                                    <TypographyMuted className="leading-tight">
+                                      м
+                                    </TypographyMuted>
+                                  )}
+                                  {(col === 'γ' ||
+                                    col === 'γ sat' ||
+                                    col === 'ks') && (
+                                    <TypographyMuted className="leading-tight">
+                                      кН/м<sup>3</sup>
+                                    </TypographyMuted>
+                                  )}
+                                  {col === 'c' && (
+                                    <TypographyMuted className="leading-tight">
+                                      кПа
+                                    </TypographyMuted>
+                                  )}
+                                  {col === 'φ' && (
+                                    <TypographyMuted className="leading-tight">
+                                      °
+                                    </TypographyMuted>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          <div className="w-12 min-h-12 py-1 flex flex-col">
+                            <div className="self-stretch h-full flex flex-col justify-center items-start overflow-hidden" />
+                          </div>
+                        </div>
+                        {/* Строки */}
+                        {soilLayers.map((layer, idx) => (
+                          <div
+                            key={layer.id}
+                            className={`flex relative group ${
+                              hoveredRow === layer.id
+                                ? 'bg-bg-surface4'
+                                : idx % 2
+                                  ? 'bg-bg-surface2'
+                                  : 'bg-bg-surface1'
+                            } ${draggedItem === layer.id ? 'opacity-50' : ''}`}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, layer.id)}
+                            onDragOver={(e) => handleDragOver(e, layer.id)}
+                            onDrop={(e) => handleDrop(e, layer.id)}
+                            onDragEnd={handleDragEnd}
+                            onMouseEnter={() => setHoveredRow(layer.id)}
+                            onMouseLeave={() => setHoveredRow(null)}
+                          >
+                            {/* Hover область слева с кнопками */}
+                            {hoveredRow === layer.id && (
+                              <div className="absolute left-[-36px] top-0 h-12 w-auto px-2 bg-bg-surface4 rounded-l-md flex items-center justify-center gap-1 z-10 border-r-0 border-border-hard2">
+                                {/* Иконка для перетаскивания */}
+                                <div
+                                  className="cursor-move p-1 hover:bg-bg-surface5 rounded"
+                                  title="Перетащить строку"
+                                >
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 18 18"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M12.0002 5.40005C11.0061 5.40005 10.2002 4.59416 10.2002 3.60005C10.2002 2.60594 11.0061 1.80005 12.0002 1.80005C12.9943 1.80005 13.8002 2.60594 13.8002 3.60005C13.8002 4.59416 12.9943 5.40005 12.0002 5.40005Z"
+                                      fill="#C4AA97"
+                                    />
+                                    <path
+                                      d="M12.0002 10.8C11.0061 10.8 10.2002 9.99416 10.2002 9.00005C10.2002 8.00594 11.0061 7.20005 12.0002 7.20005C12.9943 7.20005 13.8002 8.00594 13.8002 9.00005C13.8002 9.99416 12.9943 10.8 12.0002 10.8Z"
+                                      fill="#C4AA97"
+                                    />
+                                    <path
+                                      d="M12.0002 16.2C11.0061 16.2 10.2002 15.3942 10.2002 14.4C10.2002 13.4059 11.0061 12.6 12.0002 12.6C12.9943 12.6 13.8002 13.4059 13.8002 14.4C13.8002 15.3942 12.9943 16.2 12.0002 16.2Z"
+                                      fill="#C4AA97"
+                                    />
+                                    <path
+                                      d="M6.0002 5.40005C5.00608 5.40005 4.2002 4.59416 4.2002 3.60005C4.2002 2.60594 5.00608 1.80005 6.0002 1.80005C6.99431 1.80005 7.8002 2.60594 7.8002 3.60005C7.8002 4.59416 6.99431 5.40005 6.0002 5.40005Z"
+                                      fill="#C4AA97"
+                                    />
+                                    <path
+                                      d="M6.0002 10.8C5.00608 10.8 4.2002 9.99416 4.2002 9.00005C4.2002 8.00594 5.00608 7.20005 6.0002 7.20005C6.99431 7.20005 7.8002 8.00594 7.8002 9.00005C7.8002 9.99416 6.99431 10.8 6.0002 10.8Z"
+                                      fill="#C4AA97"
+                                    />
+                                    <path
+                                      d="M6.0002 16.2C5.00608 16.2 4.2002 15.3942 4.2002 14.4C4.2002 13.4059 5.00608 12.6 6.0002 12.6C6.99431 12.6 7.8002 13.4059 7.8002 14.4C7.8002 15.3942 6.99431 16.2 6.0002 16.2Z"
+                                      fill="#C4AA97"
+                                    />
+                                  </svg>
+                                </div>
+                                {/* Кнопка удаления */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeSoilLayer(layer.id);
+                                  }}
+                                  className="p-1 hover:bg-red-100 rounded text-gray-400 hover:text-red-600 transition-colors"
+                                  aria-label="Удалить грунт"
+                                  title="Удалить строку"
+                                >
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 18 18"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M3 4.63235L15 4.63235M12 15.75H6C5.17157 15.75 4.5 15.0389 4.5 14.1618V5.42647C4.5 4.98789 4.83579 4.63235 5.25 4.63235H12.75C13.1642 4.63235 13.5 4.98789 13.5 5.42647V14.1618C13.5 15.0389 12.8284 15.75 12 15.75ZM7.5 4.63235H10.5C10.9142 4.63235 11.25 4.27681 11.25 3.83824V3.04412C11.25 2.60554 10.9142 2.25 10.5 2.25H7.5C7.08579 2.25 6.75 2.60554 6.75 3.04412V3.83824C6.75 4.27681 7.08579 4.63235 7.5 4.63235Z"
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            )}
+
+                            {/* ИГЭ */}
+                            <div className="w-[74px] min-h-12 py-1 flex flex-col">
+                              <div className="self-stretch h-full px-2.5 flex flex-col justify-center items-start overflow-hidden">
+                                <Input
+                                  value={layer.ige}
+                                  onChange={(e) =>
+                                    updateSoilLayer(
+                                      layer.id,
+                                      'ige',
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full h-8 text-end bg-transparent border-none shadow-none focus:ring-0 focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                            {/* Грунт */}
+                            <div className="w-[250px] min-h-12 py-1 flex flex-col">
+                              <div className="self-stretch h-full px-2.5  flex flex-col justify-center items-start overflow-hidden">
+                                <Select
+                                  value={layer.type}
+                                  onValueChange={(value) =>
+                                    updateSoilLayer(layer.id, 'type', value)
+                                  }
+                                >
+                                  <SelectTrigger className="w-full h-8 bg-transparent border-none shadow-none focus:ring-0 p-0 text-sm font-medium text-left data-[placeholder]:text-muted-foreground">
+                                    <SelectValue placeholder="Выберите грунт" />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-40 overflow-y-auto bg-bg-surface1 rounded-sm shadow-lg">
+                                    {soilTypes.map((type) => (
+                                      <SelectItem
+                                        key={type}
+                                        value={type}
+                                        className="p-1.5 text-xs font-medium rounded-sm data-[state=checked]:bg-accent-default data-[state=checked]:text-accent-on-accent text-left"
+                                      >
+                                        {type}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            {/* Остальные ячейки */}
+                            {soilFields.map((field) => (
+                              <div
+                                key={field}
+                                className="w-[74px] min-h-12 py-1 flex flex-col"
+                              >
+                                <div className="self-stretch h-full flex flex-col justify-center items-start overflow-hidden">
+                                  <Input
+                                    value={layer[field]}
+                                    onChange={(e) =>
+                                      updateSoilLayer(
+                                        layer.id,
+                                        field,
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full h-8 text-start bg-transparent border-none shadow-none focus:ring-0 focus:outline-none"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                            <div className="w-12 min-h-12 py-1 flex flex-col">
+                              <div className="self-stretch h-full flex flex-col justify-center items-start overflow-hidden" />
                             </div>
                           </div>
                         ))}
-                        <div className="w-12 h-12 flex items-center justify-center" />
                       </div>
-                      {/* Строки */}
-                      {soilLayers.map((layer, idx) => (
-                        <div
-                          key={layer.id}
-                          className={`flex ${idx % 2 ? 'bg-bg-surface2' : 'bg-bg-surface1'}`}
-                        >
-                          {/* ИГЭ */}
-                          <div className="w-[74px] h-12 flex items-center justify-end px-2.5">
-                            <Input
-                              value={layer.ige}
-                              onChange={(e) =>
-                                updateSoilLayer(layer.id, 'ige', e.target.value)
-                              }
-                              className="w-full h-8 text-end bg-transparent border-none shadow-none focus:ring-0 focus:outline-none"
-                            />
-                          </div>
-                          {/* Грунт */}
-                          <div className="w-[250px] h-12 flex items-center px-2.5">
-                            <Select
-                              value={layer.type}
-                              onValueChange={(value) =>
-                                updateSoilLayer(layer.id, 'type', value)
-                              }
-                            >
-                              <SelectTrigger className="w-full h-8 bg-bg-surface1 border border-border-soft rounded-sm px-2 text-sm font-medium text-left">
-                                <SelectValue placeholder="Выберите грунт" />
-                              </SelectTrigger>
-                              <SelectContent className="max-h-40 overflow-y-auto bg-bg-surface1 rounded-sm shadow-lg">
-                                {soilTypes.map((type) => (
-                                  <SelectItem
-                                    key={type}
-                                    value={type}
-                                    className="p-1.5 text-xs font-medium rounded-sm data-[state=checked]:bg-accent-default data-[state=checked]:text-accent-on-accent text-left"
-                                  >
-                                    {type}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          {/* Остальные ячейки */}
-                          {soilFields.map((field) => (
-                            <div
-                              key={field}
-                              className="w-[74px] h-12 flex items-center justify-end"
-                            >
-                              <Input
-                                value={layer[field]}
-                                onChange={(e) =>
-                                  updateSoilLayer(
-                                    layer.id,
-                                    field,
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full h-8 text-end bg-transparent border-none shadow-none focus:ring-0 focus:outline-none"
-                              />
-                            </div>
-                          ))}
-                          {/* Кнопка удалить */}
-                          <div className="w-12 h-12 flex items-center justify-center">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeSoilLayer(layer.id)}
-                              className="text-destructive hover:text-destructive"
-                              aria-label="Удалить грунт"
-                              tabIndex={0}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
                     </div>
+                    <Button
+                      variant="default"
+                      size="full"
+                      className="mt-4 flex gap-2 justify-center items-center bg-fg-default text-bg-surface1 hover:bg-fg-default hover:text-bg-surface1"
+                      onClick={addSoilLayer}
+                      aria-label="Добавить грунт"
+                      tabIndex={0}
+                      leftIcon={
+                        <Plus className="h-5 w-5 text-accent-default" />
+                      }
+                    >
+                      <span>Добавить грунт</span>
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="full"
-                    className="mt-4 flex gap-2 justify-center items-center"
-                    onClick={addSoilLayer}
-                    aria-label="Добавить грунт"
-                    tabIndex={0}
-                    leftIcon={<Plus className="h-5 w-5 text-accent-default" />}
-                  >
-                    <span>Добавить грунт</span>
-                  </Button>
-                </div>
+                </TooltipProvider>
 
                 {/* Параметры котлована */}
                 <div className="p-6 space-y-6">
@@ -771,57 +1005,83 @@ function DashboardPage() {
                     </h2>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <InputWithSlider
+                    <InputWithControls
+                      placeholder={'Введите значение (м)'}
                       measure="h"
                       title="Уровень грунтовых вод"
                       value={groundwaterLevel}
-                      unit="м"
+                      suffix="м"
                       min={0}
                       max={500}
-                      onChange={setGroundwaterLevel}
+                      onChange={(value) => setGroundwaterLevel(Number(value))}
                       onInfoClick={handleInfoClick}
+                      showInfoButton={true}
+                      showSlider={true}
+                      type="number"
+                      size="md"
                     />
-                    <InputWithSlider
+                    {/* Угол наклона поверхности грунта */}
+                    <InputWithControls
+                      placeholder={'Введите значение (°)'}
                       measure="β"
                       title="Угол наклона поверхности грунта"
                       value={slopeAngle}
-                      unit="°"
+                      suffix="°"
                       min={0}
                       max={90}
-                      onChange={setSlopeAngle}
+                      step={1}
+                      onChange={(value) => setSlopeAngle(Number(value))}
                       onInfoClick={handleInfoClick}
+                      showInfoButton={true}
+                      showSlider={true}
+                      type="number"
+                      size="md"
                     />
-                    <InputWithSlider
+
+                    {/* Глубина котлована */}
+                    <InputWithControls
+                      placeholder={'Введите значение (м)'}
                       measure="H"
                       title="Глубина котлована"
                       value={pitDepth}
-                      unit="м"
+                      suffix="м"
                       min={0}
-                      max={100}
-                      onChange={setPitDepth}
-                      onInfoClick={handleInfoClick}
+                      max={200}
+                      step={1}
+                      onChange={(value) => setPitDepth(Number(value))}
+                      type="number"
+                      size="md"
                     />
-                    <InputWithSlider
+
+                    {/* Длина ограждения */}
+                    <InputWithControls
+                      placeholder={'Введите значение (м)'}
                       measure="L"
                       title="Длина ограждения"
                       value={fenceLength}
-                      unit="м"
+                      suffix="м"
                       min={0}
                       max={100}
-                      onChange={setFenceLength}
-                      onInfoClick={handleInfoClick}
+                      step={1}
+                      onChange={(value) => setFenceLength(Number(value))}
+                      type="number"
+                      size="md"
                     />
                   </div>
                   <div className="mt-6 max-w-xs">
-                    <InputWithSlider
+                    <InputWithControls
                       measure=""
                       title="Глубина заделки"
                       value={embedmentDepth}
-                      unit="м"
+                      suffix="м"
                       min={0}
                       max={100}
-                      onChange={setEmbedmentDepth}
+                      onChange={(value) => setEmbedmentDepth(Number(value))}
                       onInfoClick={handleInfoClick}
+                      showInfoButton={true}
+                      showSlider={true}
+                      type="number"
+                      size="md"
                     />
                   </div>
                 </div>

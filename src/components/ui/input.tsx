@@ -21,7 +21,7 @@ function Input({
         )}
       >
         {prefix && (
-          <span className="flex items-center pl-2.5 pr-1 text-fg-soft select-none">
+          <span className="flex items-center pl-2.5 pr-1 text-fg-default select-none text-[16px] leading-[120%] tracking-[-0.01em] font-semibold">
             {prefix}
           </span>
         )}
@@ -37,7 +37,7 @@ function Input({
           {...props}
         />
         {suffix && (
-          <span className="flex items-center pr-2.5 pl-1 text-fg-soft select-none">
+          <span className="flex items-center pr-2.5 pl-1 text-fg-default select-none">
             {suffix}
           </span>
         )}

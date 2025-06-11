@@ -1,6 +1,10 @@
 'use client';
 
+import CopyRight from '@/components/icon/copy-right';
+import Heart from '@/components/icon/heart';
+import HeartFilled from '@/components/icon/heart-filled';
 import SortVertical from '@/components/icon/sort-vertical';
+import Trash from '@/components/icon/trash';
 import {
   PageActions,
   PageContainer,
@@ -26,7 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Copy, Heart, Plus, Search, Trash2 } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface Project {
@@ -39,6 +43,8 @@ interface Project {
   isFavorite: boolean;
   status?: string;
 }
+
+type SortState = 'none' | 'asc' | 'desc';
 
 function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([
@@ -144,28 +150,26 @@ function ProjectsPage() {
   ]);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortState, setSortState] = useState<SortState>('none');
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
-  const handleSort = (field: 'name') => {
-    if (sortBy === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(field);
-      setSortDirection('asc');
-    }
+  const handleSort = () => {
+    // Циклическое переключение состояний: none → asc → desc → none
+    const nextState: Record<SortState, SortState> = {
+      none: 'asc',
+      asc: 'desc',
+      desc: 'none',
+    };
+
+    setSortState(nextState[sortState]);
   };
 
   const getSortedProjects = () => {
-    if (!sortBy) return projects;
+    if (sortState === 'none') return projects;
 
     return [...projects].sort((a, b) => {
-      if (sortBy === 'name') {
-        const comparison = a.name.localeCompare(b.name, 'ru');
-        return sortDirection === 'asc' ? comparison : -comparison;
-      }
-      return 0;
+      const comparison = a.name.localeCompare(b.name, 'ru');
+      return sortState === 'asc' ? comparison : -comparison;
     });
   };
 
@@ -215,14 +219,14 @@ function ProjectsPage() {
                     placeholder="Поиск по проектам"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="p-1.5 pl-8 bg-bg-surface1 rounded border border-border-hard text-fg-soft text-xs font-medium h-auto"
+                    className="p-1.5 pl-8 h-7.5 bg-bg-surface1 rounded border border-border-hard text-fg-soft text-xs font-medium"
                   />
                 </div>
               </div>
 
               {/* Filters dropdown */}
               <Select>
-                <SelectTrigger className="p-1.5 bg-bg-surface1 rounded border border-border-hard text-fg-soft text-xs font-medium h-auto w-auto">
+                <SelectTrigger className="p-1.5 h-7.5 bg-bg-surface1 rounded border border-border-hard text-fg-soft text-xs font-medium w-auto">
                   <SelectValue placeholder="Фильтры" />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,27 +252,42 @@ function ProjectsPage() {
               <div className="w-full h-10 pl-10 inline-flex justify-start items-start">
                 {/* Project name column */}
                 <div className="flex-1 px-1 py-2.5 flex justify-start items-start gap-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        rightIcon={
-                          <SortVertical className="w-5 h-5 text-fg-soft" />
-                        }
-                        variant="ghost"
-                        onClick={() => handleSort('name')}
-                        className="px-1.5 bg-bg-surface3 rounded flex justify-start items-center gap-1 h-auto p-1"
-                      >
-                        <span className="text-fg-soft text-sm font-medium">
+                  {sortState === 'none' ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span
+                          className="text-fg-soft text-sm font-medium cursor-pointer px-1.5 py-1"
+                          onClick={() => handleSort()}
+                        >
                           Название
                         </span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side={'bottom'}>
-                      <TypographyBodyM>Сортировка</TypographyBodyM>
-                    </TooltipContent>
-                  </Tooltip>
+                      </TooltipTrigger>
+                      <TooltipContent side={'bottom'}>
+                        <TypographyBodyM>Сортировка</TypographyBodyM>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          rightIcon={
+                            <SortVertical className="w-5 h-5 text-fg-soft" />
+                          }
+                          variant="ghost"
+                          onClick={() => handleSort()}
+                          className="px-1.5 bg-bg-surface3 rounded flex justify-start items-center gap-1 h-auto p-1"
+                        >
+                          <span className="text-fg-soft text-sm font-medium">
+                            Название
+                          </span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side={'bottom'}>
+                        <TypographyBodyM>Сортировка</TypographyBodyM>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-
                 {/* Project info columns */}
                 <div className="flex-1 flex justify-between items-center">
                   <div className="w-36 px-1 py-2.5 flex justify-start items-center gap-1.5">
@@ -285,7 +304,7 @@ function ProjectsPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="w-24 py-2.5 flex justify-center items-center gap-1.5">
+                  <div className="w-24 py-2.5 flex justify-start items-center gap-1.5">
                     <span className="text-fg-soft text-sm font-medium">
                       Действия
                     </span>
@@ -308,30 +327,26 @@ function ProjectsPage() {
                   >
                     {/* Favourites case */}
                     <div className="w-10 h-10 relative">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            onClick={() => toggleFavorite(project.id)}
-                            className="p-2.5 absolute left-0 top-0 rounded inline-flex justify-center items-center hover:bg-transparent h-auto"
-                          >
-                            <Heart
-                              className={`w-5 h-5 ${
-                                project.isFavorite
-                                  ? 'text-accent-active fill-current'
-                                  : 'text-fg-default'
-                              }`}
-                            />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side={'bottom'}>
-                          <TypographyBodyM>
-                            {project.isFavorite
-                              ? 'Убрать из избранного'
-                              : 'В избранное'}
-                          </TypographyBodyM>
-                        </TooltipContent>
-                      </Tooltip>
+                      {(project.isFavorite || hoveredRow === project.id) && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              onClick={() => toggleFavorite(project.id)}
+                              className="p-2.5 absolute left-0 top-0 rounded inline-flex justify-center items-center hover:bg-transparent h-auto"
+                            >
+                              {project.isFavorite ? <HeartFilled /> : <Heart />}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side={'bottom'}>
+                            <TypographyBodyM>
+                              {project.isFavorite
+                                ? 'Убрать из избранного'
+                                : 'В избранное'}
+                            </TypographyBodyM>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                     </div>
 
                     {/* Project name */}
@@ -347,7 +362,7 @@ function ProjectsPage() {
                     {/* Project info */}
                     <div className="flex-1 flex justify-between items-center">
                       {/* Update info */}
-                      <div className="w-36 px-2.5 py-1 flex justify-start items-center gap-1.5">
+                      <div className="w-36 px-1 py-1 flex justify-start items-center gap-1.5">
                         <span className="text-fg-soft text-sm font-medium">
                           {project.updatedAt}
                         </span>
@@ -357,8 +372,8 @@ function ProjectsPage() {
                       </div>
 
                       {/* Counter */}
-                      <div className="p-2.5 flex justify-center items-center gap-1.5">
-                        <span className="w-32 text-center text-fg-soft text-sm font-medium">
+                      <div className="p-2.5 flex justify-start items-center gap-1.5">
+                        <span className="w-32 text-fg-soft text-sm font-medium">
                           {project.calculationsCount}
                         </span>
                       </div>
@@ -374,7 +389,7 @@ function ProjectsPage() {
                                   onClick={() => copyProject(project.id)}
                                   className="p-2.5 rounded flex justify-center items-center hover:bg-transparent h-auto"
                                 >
-                                  <Copy className="w-5 h-5 text-fg-default" />
+                                  <CopyRight className="w-5 h-5 text-fg-default" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side={'bottom'}>
@@ -389,7 +404,7 @@ function ProjectsPage() {
                                   onClick={() => deleteProject(project.id)}
                                   className="p-2.5 rounded flex justify-center items-center hover:bg-transparent h-auto"
                                 >
-                                  <Trash2 className="w-5 h-5 text-fg-default" />
+                                  <Trash className="w-5 h-5 text-fg-default" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side={'bottom'}>

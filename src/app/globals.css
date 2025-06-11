@@ -3,6 +3,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 @theme inline {
     /* Новая цветовая палитра из макета */
     --color-neutral-900: #0E1117;
