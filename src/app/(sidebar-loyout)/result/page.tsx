@@ -1,15 +1,26 @@
 'use client';
+import Edit from '@/components/icon/edit';
+import Trash from '@/components/icon/trash';
 import {
   PageContainer,
   PageContent,
   PageHeader,
   PageTitle,
 } from '@/components/page-container';
-import { TypographyH2, TypographyMuted } from '@/components/typography';
+import {
+  TypographyBodyM,
+  TypographyH2,
+  TypographyMuted,
+} from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { InputWithSlider } from '@/components/ui/input-with-slider';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset } from '@/components/ui/sidebar';
 import {
@@ -30,11 +41,9 @@ import {
 import {
   AlertTriangle,
   Check,
-  Edit2,
   Eye,
   FileText,
   Plus,
-  Trash2,
   X,
   Zap,
 } from 'lucide-react';
@@ -295,7 +304,7 @@ function ResultPage() {
   return (
     <TooltipProvider>
       <SidebarInset>
-        <PageContainer>
+        <PageContainer className="p-0">
           {/* Header с табами */}
           <PageHeader>
             <div className="flex items-center gap-2 flex-1">
@@ -344,7 +353,7 @@ function ResultPage() {
                               value={tab.id}
                               className="pr-12 min-w-0"
                             >
-                              <span className="truncate max-w-[100px]">
+                              <span className="truncate max-w-[140px]">
                                 {tab.name}
                               </span>
                             </TabsTrigger>
@@ -359,7 +368,7 @@ function ResultPage() {
                                   startEditing(tab.id, tab.name);
                                 }}
                               >
-                                <Edit2 className="h-3 w-3" />
+                                <Edit className="h-3 w-3" />
                               </Button>
                               {tabs.length > 1 && (
                                 <Button
@@ -381,13 +390,8 @@ function ResultPage() {
                     ))}
                   </TabsList>
 
-                  <Button
-                    size="default"
-                    variant="outline"
-                    onClick={addNewTab}
-                    leftIcon={<Plus className="h-4 w-4 mr-1" />}
-                  >
-                    Добавить расчет
+                  <Button size="default" variant="outline" onClick={addNewTab}>
+                    <Plus className="h-4 w-4 text-accent-default" />
                   </Button>
                 </div>
               </Tabs>
@@ -405,11 +409,501 @@ function ResultPage() {
                   className="mt-0 space-y-0"
                 >
                   {/* Main Content - Two Columns */}
-                  <div className="space-y-6">
-                    <div className="flex flex-col lg:flex-row gap-6">
-                      {/* Left Column */}
-                      <div className="flex-1 space-y-6 p-6">
-                        {/* Информация о проекте */}
+                  <ResizablePanelGroup direction="horizontal">
+                    {/* Left Column */}
+                    <ResizablePanel className="flex flex-col">
+                      {/* Информация о проекте */}
+                      <PageHeader className="flex py-6 px-5  items-start">
+                        <div className="flex flex-col gap-2">
+                          <PageTitle>Мои проекты</PageTitle>
+                          <TypographyMuted className="text-muted-foreground">
+                            Обновлено 25.12.2024 17:02
+                          </TypographyMuted>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={startEditingTitle}
+                            className="bg-bg-surface2"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="bg-bg-surface2"
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </PageHeader>
+
+                      {/* Табы второго уровня */}
+
+                      <Tabs
+                        value={leftActiveTab}
+                        onValueChange={setLeftActiveTab}
+                      >
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="excavation">
+                            <TypographyBodyM>
+                              Ограждение и котлован
+                            </TypographyBodyM>
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="loads"
+                            className="text-xs md:text-sm"
+                          >
+                            <TypographyBodyM>Нагрузки</TypographyBodyM>
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="anchors"
+                            className="text-xs md:text-sm"
+                          >
+                            <TypographyBodyM>Анкеры и распорки</TypographyBodyM>
+                          </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="excavation" className="space-y-6">
+                          {/* Характеристики грунтов */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h2 className="text-xl font-semibold">
+                                Характеристики грунтов
+                              </h2>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={addSoilLayer}
+                                leftIcon={<Plus className="h-4 w-4 mr-1" />}
+                              >
+                                Добавить грунт
+                              </Button>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="text-center">
+                                      ИГЭ
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      Грунт
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      <div className="flex flex-col items-center">
+                                        <span>h</span>
+                                        <span className="text-xs text-muted-foreground">
+                                          м
+                                        </span>
+                                      </div>
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      <div className="flex flex-col items-center">
+                                        <span>H2</span>
+                                        <span className="text-xs text-muted-foreground">
+                                          м
+                                        </span>
+                                      </div>
+                                    </TableHead>
+                                    <TableHead />
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {soilLayers.map((layer) => (
+                                    <TableRow key={layer.id}>
+                                      <TableCell>
+                                        <div className="flex justify-center">
+                                          <Input
+                                            value={layer.ige}
+                                            onChange={(e) =>
+                                              updateSoilLayer(
+                                                layer.id,
+                                                'ige',
+                                                e.target.value
+                                              )
+                                            }
+                                            className="w-12 h-8 text-center"
+                                          />
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex justify-center">
+                                          <Input
+                                            value={layer.type}
+                                            onChange={(e) =>
+                                              updateSoilLayer(
+                                                layer.id,
+                                                'type',
+                                                e.target.value
+                                              )
+                                            }
+                                            className="w-32 h-8 text-center"
+                                          />
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex justify-center">
+                                          <Input
+                                            value={layer.h}
+                                            onChange={(e) =>
+                                              updateSoilLayer(
+                                                layer.id,
+                                                'h',
+                                                e.target.value
+                                              )
+                                            }
+                                            className="w-16 h-8 text-center"
+                                          />
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex justify-center">
+                                          <Input
+                                            value={layer.h2}
+                                            onChange={(e) =>
+                                              updateSoilLayer(
+                                                layer.id,
+                                                'h2',
+                                                e.target.value
+                                              )
+                                            }
+                                            className="w-16 h-8 text-center"
+                                          />
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex justify-center">
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                  removeSoilLayer(layer.id)
+                                                }
+                                                className="text-destructive hover:text-destructive p-1"
+                                              >
+                                                <X className="h-4 w-4" />
+                                              </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent side={'bottom'}>
+                                              <p>Удалить</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+
+                          {/* Параметры котлована */}
+                          <div className="space-y-4">
+                            <h2 className="text-xl font-semibold">
+                              Параметры котлована
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <InputWithSlider
+                                measure="h"
+                                subtitle="w"
+                                title="Уровень грунтовых вод"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.groundwaterLevel)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.groundwaterLevel)
+                                }
+                                unit="м"
+                                min={0}
+                                max={500}
+                                step={1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    groundwaterLevel: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="β"
+                                title="Угол наклона поверхности грунта"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.slopeAngle)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.slopeAngle)
+                                }
+                                unit="°"
+                                min={0}
+                                max={90}
+                                step={1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    slopeAngle: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="H"
+                                title="Глубина котлована"
+                                value={
+                                  Number.isNaN(Number(excavationParams.depth))
+                                    ? 0
+                                    : Number(excavationParams.depth)
+                                }
+                                unit="м"
+                                min={0}
+                                max={50}
+                                step={0.1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    depth: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="L"
+                                title="Длина ограждения"
+                                value={
+                                  Number.isNaN(Number(excavationParams.length))
+                                    ? 0
+                                    : Number(excavationParams.length)
+                                }
+                                unit="м"
+                                min={0}
+                                max={100}
+                                step={0.1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    length: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure=""
+                                title="Глубина заделки"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.embedmentDepth)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.embedmentDepth)
+                                }
+                                unit="м"
+                                min={0}
+                                max={50}
+                                step={0.1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    embedmentDepth: String(val),
+                                  }))
+                                }
+                                disabled
+                              />
+                            </div>
+                          </div>
+
+                          {/* Ограждение */}
+                          <div className="space-y-4">
+                            <h2 className="text-xl font-semibold">
+                              Ограждение
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <InputWithSlider
+                                measure="γ"
+                                title="Контакт с грунтом"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.contactCoeff)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.contactCoeff)
+                                }
+                                unit=""
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    contactCoeff: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="E"
+                                title="Модуль упругости стены"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.elasticModulus)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.elasticModulus)
+                                }
+                                unit="МПа"
+                                min={0}
+                                max={500}
+                                step={1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    elasticModulus: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="J"
+                                title="Момент инерции стены"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.momentInertia)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.momentInertia)
+                                }
+                                unit="см⁴"
+                                min={0}
+                                max={100}
+                                step={0.01}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    momentInertia: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="b"
+                                title="Шаг ограждения"
+                                value={
+                                  Number.isNaN(Number(excavationParams.step))
+                                    ? 0
+                                    : Number(excavationParams.step)
+                                }
+                                unit="мм"
+                                min={0}
+                                max={100}
+                                step={1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    step: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="B"
+                                title="Ширина одного элемента ограждения"
+                                value={
+                                  Number.isNaN(Number(excavationParams.width))
+                                    ? 0
+                                    : Number(excavationParams.width)
+                                }
+                                unit="мм"
+                                min={0}
+                                max={1000}
+                                step={1}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    width: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="W"
+                                title="Момент сопротивления"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.momentResistance)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.momentResistance)
+                                }
+                                unit="см³"
+                                min={0}
+                                max={10}
+                                step={0.01}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    momentResistance: String(val),
+                                  }))
+                                }
+                              />
+                              <InputWithSlider
+                                measure="R"
+                                title="Момент сопротивления"
+                                value={
+                                  Number.isNaN(
+                                    Number(excavationParams.momentResistance2)
+                                  )
+                                    ? 0
+                                    : Number(excavationParams.momentResistance2)
+                                }
+                                unit="МПа"
+                                min={0}
+                                max={10}
+                                step={0.01}
+                                onChange={(val) =>
+                                  setExcavationParams((prev) => ({
+                                    ...prev,
+                                    momentResistance2: String(val),
+                                  }))
+                                }
+                              />
+                            </div>
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="loads" className="space-y-6">
+                          <div>
+                            <PageHeader>
+                              <PageTitle className="text-lg">
+                                Нагрузки
+                              </PageTitle>
+                            </PageHeader>
+                            <PageContent>
+                              <p className="text-muted-foreground">
+                                Настройка нагрузок...
+                              </p>
+                            </PageContent>
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="anchors" className="space-y-6">
+                          <div>
+                            <PageHeader>
+                              <CardTitle className="text-lg">
+                                Анкеры и распорки
+                              </CardTitle>
+                            </PageHeader>
+                            <PageContent>
+                              <p className="text-muted-foreground">
+                                Настройка анкеров и распорки...
+                              </p>
+                            </PageContent>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    </ResizablePanel>
+
+                    <ResizableHandle />
+
+                    {/* Right Column */}
+                    <ResizablePanel className="flex flex-col px-2">
+                      <div className="space-y-6">
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             {isEditingTitle ? (
@@ -450,12 +944,16 @@ function ResultPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={startEditingTitle}
-                                  className="hover:bg-blue-50 hover:text-blue-600"
+                                  className="bg-bg-surface2"
                                 >
-                                  <Edit2 className="h-4 w-4" />
+                                  <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Trash2 className="h-4 w-4" />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="bg-bg-surface2"
+                                >
+                                  <Trash className="h-4 w-4" />
                                 </Button>
                               </div>
                             )}
@@ -468,467 +966,70 @@ function ResultPage() {
 
                         <Separator className={'h-px'} />
 
-                        {/* Табы второго уровня */}
                         <Tabs
-                          value={leftActiveTab}
-                          onValueChange={setLeftActiveTab}
+                          value={rightActiveTab}
+                          onValueChange={setRightActiveTab}
                         >
-                          <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger
-                              value="excavation"
-                              className="text-xs md:text-sm"
-                            >
-                              Ограждение
+                          <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="document" className="gap-2">
+                              <FileText className="h-4 w-4" />
+                              Документ
                             </TabsTrigger>
                             <TabsTrigger
-                              value="loads"
-                              className="text-xs md:text-sm"
+                              value="visualization"
+                              className="gap-2"
                             >
-                              Нагрузки
-                            </TabsTrigger>
-                            <TabsTrigger
-                              value="anchors"
-                              className="text-xs md:text-sm"
-                            >
-                              Анкеры и распирки
+                              <Eye className="h-4 w-4" />
+                              Визуализация
                             </TabsTrigger>
                           </TabsList>
 
-                          <TabsContent value="excavation" className="space-y-6">
-                            {/* Характеристики грунтов */}
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">
-                                  Характеристики грунтов
-                                </h2>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={addSoilLayer}
-                                  leftIcon={<Plus className="h-4 w-4 mr-1" />}
-                                >
-                                  Добавить грунт
-                                </Button>
-                              </div>
-
-                              <div className="overflow-x-auto">
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead className="text-center">
-                                        ИГЭ
-                                      </TableHead>
-                                      <TableHead className="text-center">
-                                        Грунт
-                                      </TableHead>
-                                      <TableHead className="text-center">
-                                        <div className="flex flex-col items-center">
-                                          <span>h</span>
-                                          <span className="text-xs text-muted-foreground">
-                                            м
-                                          </span>
-                                        </div>
-                                      </TableHead>
-                                      <TableHead className="text-center">
-                                        <div className="flex flex-col items-center">
-                                          <span>H2</span>
-                                          <span className="text-xs text-muted-foreground">
-                                            м
-                                          </span>
-                                        </div>
-                                      </TableHead>
-                                      <TableHead />
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {soilLayers.map((layer) => (
-                                      <TableRow key={layer.id}>
-                                        <TableCell>
-                                          <div className="flex justify-center">
-                                            <Input
-                                              value={layer.ige}
-                                              onChange={(e) =>
-                                                updateSoilLayer(
-                                                  layer.id,
-                                                  'ige',
-                                                  e.target.value
-                                                )
-                                              }
-                                              className="w-12 h-8 text-center"
-                                            />
-                                          </div>
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex justify-center">
-                                            <Input
-                                              value={layer.type}
-                                              onChange={(e) =>
-                                                updateSoilLayer(
-                                                  layer.id,
-                                                  'type',
-                                                  e.target.value
-                                                )
-                                              }
-                                              className="w-32 h-8 text-center"
-                                            />
-                                          </div>
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex justify-center">
-                                            <Input
-                                              value={layer.h}
-                                              onChange={(e) =>
-                                                updateSoilLayer(
-                                                  layer.id,
-                                                  'h',
-                                                  e.target.value
-                                                )
-                                              }
-                                              className="w-16 h-8 text-center"
-                                            />
-                                          </div>
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex justify-center">
-                                            <Input
-                                              value={layer.h2}
-                                              onChange={(e) =>
-                                                updateSoilLayer(
-                                                  layer.id,
-                                                  'h2',
-                                                  e.target.value
-                                                )
-                                              }
-                                              className="w-16 h-8 text-center"
-                                            />
-                                          </div>
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex justify-center">
-                                            <Tooltip>
-                                              <TooltipTrigger asChild>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  onClick={() =>
-                                                    removeSoilLayer(layer.id)
-                                                  }
-                                                  className="text-destructive hover:text-destructive p-1"
-                                                >
-                                                  <X className="h-4 w-4" />
-                                                </Button>
-                                              </TooltipTrigger>
-                                              <TooltipContent side={'bottom'}>
-                                                <p>Удалить</p>
-                                              </TooltipContent>
-                                            </Tooltip>
-                                          </div>
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </div>
-                            </div>
-
-                            {/* Параметры котлована */}
-                            <div className="space-y-4">
-                              <h2 className="text-xl font-semibold">
-                                Параметры котлована
-                              </h2>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InputWithSlider
-                                  measure="h"
-                                  subtitle="w"
-                                  title="Уровень грунтовых вод"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.groundwaterLevel)
-                                    )
-                                      ? 0
-                                      : Number(
-                                          excavationParams.groundwaterLevel
-                                        )
-                                  }
-                                  unit="м"
-                                  min={0}
-                                  max={500}
-                                  step={1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      groundwaterLevel: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="β"
-                                  title="Угол наклона поверхности грунта"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.slopeAngle)
-                                    )
-                                      ? 0
-                                      : Number(excavationParams.slopeAngle)
-                                  }
-                                  unit="°"
-                                  min={0}
-                                  max={90}
-                                  step={1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      slopeAngle: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="H"
-                                  title="Глубина котлована"
-                                  value={
-                                    Number.isNaN(Number(excavationParams.depth))
-                                      ? 0
-                                      : Number(excavationParams.depth)
-                                  }
-                                  unit="м"
-                                  min={0}
-                                  max={50}
-                                  step={0.1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      depth: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="L"
-                                  title="Длина ограждения"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.length)
-                                    )
-                                      ? 0
-                                      : Number(excavationParams.length)
-                                  }
-                                  unit="м"
-                                  min={0}
-                                  max={100}
-                                  step={0.1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      length: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure=""
-                                  title="Глубина заделки"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.embedmentDepth)
-                                    )
-                                      ? 0
-                                      : Number(excavationParams.embedmentDepth)
-                                  }
-                                  unit="м"
-                                  min={0}
-                                  max={50}
-                                  step={0.1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      embedmentDepth: String(val),
-                                    }))
-                                  }
-                                  disabled
-                                />
-                              </div>
-                            </div>
-
-                            {/* Ограждение */}
-                            <div className="space-y-4">
-                              <h2 className="text-xl font-semibold">
-                                Ограждение
-                              </h2>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InputWithSlider
-                                  measure="γ"
-                                  title="Контакт с грунтом"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.contactCoeff)
-                                    )
-                                      ? 0
-                                      : Number(excavationParams.contactCoeff)
-                                  }
-                                  unit=""
-                                  min={0}
-                                  max={1}
-                                  step={0.01}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      contactCoeff: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="E"
-                                  title="Модуль упругости стены"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.elasticModulus)
-                                    )
-                                      ? 0
-                                      : Number(excavationParams.elasticModulus)
-                                  }
-                                  unit="МПа"
-                                  min={0}
-                                  max={500}
-                                  step={1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      elasticModulus: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="J"
-                                  title="Момент инерции стены"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.momentInertia)
-                                    )
-                                      ? 0
-                                      : Number(excavationParams.momentInertia)
-                                  }
-                                  unit="см⁴"
-                                  min={0}
-                                  max={100}
-                                  step={0.01}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      momentInertia: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="b"
-                                  title="Шаг ограждения"
-                                  value={
-                                    Number.isNaN(Number(excavationParams.step))
-                                      ? 0
-                                      : Number(excavationParams.step)
-                                  }
-                                  unit="мм"
-                                  min={0}
-                                  max={100}
-                                  step={1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      step: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="B"
-                                  title="Ширина одного элемента ограждения"
-                                  value={
-                                    Number.isNaN(Number(excavationParams.width))
-                                      ? 0
-                                      : Number(excavationParams.width)
-                                  }
-                                  unit="мм"
-                                  min={0}
-                                  max={1000}
-                                  step={1}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      width: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="W"
-                                  title="Момент сопротивления"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.momentResistance)
-                                    )
-                                      ? 0
-                                      : Number(
-                                          excavationParams.momentResistance
-                                        )
-                                  }
-                                  unit="см³"
-                                  min={0}
-                                  max={10}
-                                  step={0.01}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      momentResistance: String(val),
-                                    }))
-                                  }
-                                />
-                                <InputWithSlider
-                                  measure="R"
-                                  title="Момент сопротивления"
-                                  value={
-                                    Number.isNaN(
-                                      Number(excavationParams.momentResistance2)
-                                    )
-                                      ? 0
-                                      : Number(
-                                          excavationParams.momentResistance2
-                                        )
-                                  }
-                                  unit="МПа"
-                                  min={0}
-                                  max={10}
-                                  step={0.01}
-                                  onChange={(val) =>
-                                    setExcavationParams((prev) => ({
-                                      ...prev,
-                                      momentResistance2: String(val),
-                                    }))
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </TabsContent>
-
-                          <TabsContent value="loads" className="space-y-6">
+                          <TabsContent value="document">
                             <div>
-                              <PageHeader>
-                                <PageTitle className="text-lg">
-                                  Нагрузки
-                                </PageTitle>
-                              </PageHeader>
+                              <PageContent className="flex flex-row items-center gap-2">
+                                <AlertTriangle className="h-5 w-5 text-destructive" />
+                                <CardTitle className="text-lg">
+                                  Критические ошибки
+                                </CardTitle>
+                              </PageContent>
                               <PageContent>
-                                <p className="text-muted-foreground">
-                                  Настройка нагрузок...
-                                </p>
+                                <div className="space-y-4">
+                                  {criticalErrors.map((error) => (
+                                    <div
+                                      key={error.id}
+                                      className="border-b border-border pb-4 last:border-b-0 last:pb-0"
+                                    >
+                                      <div className="space-y-2">
+                                        <div className="flex items-start justify-between">
+                                          <h4 className="font-medium text-sm">
+                                            {error.title}
+                                          </h4>
+                                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+                                            {error.status}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">
+                                          {error.description}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
                               </PageContent>
                             </div>
                           </TabsContent>
 
-                          <TabsContent value="anchors" className="space-y-6">
+                          <TabsContent value="visualization">
                             <div>
                               <PageHeader>
                                 <CardTitle className="text-lg">
-                                  Анкеры и распирки
+                                  Визуализация
                                 </CardTitle>
                               </PageHeader>
                               <PageContent>
                                 <p className="text-muted-foreground">
-                                  Настройка анкеров и распирок...
+                                  Визуализация будет доступна после устранения
+                                  ошибок и выполнения расчета.
                                 </p>
                               </PageContent>
                             </div>
@@ -936,116 +1037,34 @@ function ResultPage() {
                         </Tabs>
                       </div>
 
-                      {/* Right Column */}
-                      <div className="flex-1 flex flex-col border-l border-border pl-6 p-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <TypographyH2>Результат</TypographyH2>
-                            <div className="text-sm text-muted-foreground">
-                              Обновлено 25.12.2024 16:48
+                      {/* Warning and Calculate Button - Fixed to Bottom */}
+                      <div className="mt-auto space-y-4">
+                        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-medium text-orange-800">
+                                Внимание
+                              </p>
+                              <p className="text-sm text-orange-700">
+                                Чтобы сделать расчет устраните ошибки
+                              </p>
                             </div>
                           </div>
-
-                          <Tabs
-                            value={rightActiveTab}
-                            onValueChange={setRightActiveTab}
-                          >
-                            <TabsList className="grid w-full grid-cols-2">
-                              <TabsTrigger value="document" className="gap-2">
-                                <FileText className="h-4 w-4" />
-                                Документ
-                              </TabsTrigger>
-                              <TabsTrigger
-                                value="visualization"
-                                className="gap-2"
-                              >
-                                <Eye className="h-4 w-4" />
-                                Визуализация
-                              </TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="document">
-                              <div>
-                                <PageContent className="flex flex-row items-center gap-2">
-                                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                                  <CardTitle className="text-lg">
-                                    Критические ошибки
-                                  </CardTitle>
-                                </PageContent>
-                                <PageContent>
-                                  <div className="space-y-4">
-                                    {criticalErrors.map((error) => (
-                                      <div
-                                        key={error.id}
-                                        className="border-b border-border pb-4 last:border-b-0 last:pb-0"
-                                      >
-                                        <div className="space-y-2">
-                                          <div className="flex items-start justify-between">
-                                            <h4 className="font-medium text-sm">
-                                              {error.title}
-                                            </h4>
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-                                              {error.status}
-                                            </span>
-                                          </div>
-                                          <p className="text-sm text-muted-foreground">
-                                            {error.description}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PageContent>
-                              </div>
-                            </TabsContent>
-
-                            <TabsContent value="visualization">
-                              <div>
-                                <PageHeader>
-                                  <CardTitle className="text-lg">
-                                    Визуализация
-                                  </CardTitle>
-                                </PageHeader>
-                                <PageContent>
-                                  <p className="text-muted-foreground">
-                                    Визуализация будет доступна после устранения
-                                    ошибок и выполнения расчета.
-                                  </p>
-                                </PageContent>
-                              </div>
-                            </TabsContent>
-                          </Tabs>
                         </div>
 
-                        {/* Warning and Calculate Button - Fixed to Bottom */}
-                        <div className="mt-auto space-y-4">
-                          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                            <div className="flex items-start gap-2">
-                              <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                              <div>
-                                <p className="text-sm font-medium text-orange-800">
-                                  Внимание
-                                </p>
-                                <p className="text-sm text-orange-700">
-                                  Чтобы сделать расчет устраните ошибки
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex justify-center">
-                            <Button
-                              leftIcon={<Zap className="mr-2 h-4 w-4" />}
-                              variant="outline"
-                              disabled
-                            >
-                              Рассчитать
-                            </Button>
-                          </div>
+                        <div className="flex justify-center">
+                          <Button
+                            leftIcon={<Zap className="mr-2 h-4 w-4" />}
+                            variant="outline"
+                            disabled
+                          >
+                            Рассчитать
+                          </Button>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
                 </TabsContent>
               ))}
             </Tabs>

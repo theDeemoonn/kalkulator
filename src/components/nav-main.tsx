@@ -1,5 +1,7 @@
 'use client';
 
+import ChevronDown from '@/components/icon/chevron-down';
+import ChevronUp from '@/components/icon/chevron-up';
 import {
   Collapsible,
   CollapsibleContent,
@@ -14,8 +16,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { ChevronDown, ChevronUp, type LucideIcon } from 'lucide-react';
+import * as React from 'react';
 import { useState } from 'react';
+import { TypographyBodyM } from './typography';
 
 export function NavMain({
   items,
@@ -23,7 +26,7 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon?: LucideIcon;
+    icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
     isActive?: boolean;
     items?: {
       title: string;
@@ -68,7 +71,7 @@ export function NavMain({
                     onClick={() => setActiveItem(item.title)}
                     tooltip={item.title}
                     className={`
-                      p-2.5 rounded inline-flex justify-start items-center gap-1.5 overflow-hidden
+                      self-stretch p-3.5 rounded-sm inline-flex justify-start items-center gap-1.5 overflow-hidden
                       ${
                         isActive
                           ? 'bg-bg-surface3 text-accent-default'
@@ -81,15 +84,15 @@ export function NavMain({
                         className={`w-5 h-5 ${isActive ? 'text-accent-default' : 'text-fg-soft'}`}
                       />
                     )}
-                    <span className="flex-1 text-sm font-medium group-data-[collapsible=icon]:hidden">
-                      {item.title}
+                    <span className="flex-1 text-sm font-medium leading-tight group-data-[collapsible=icon]:hidden">
+                      <TypographyBodyM>{item.title}</TypographyBodyM>
                     </span>
                     {item.items && (
                       <div className="ml-auto group-data-[collapsible=icon]:hidden">
                         {isOpen ? (
-                          <ChevronUp className="w-5 h-5 text-fg-soft" />
+                          <ChevronUp className="w-4 h-4 text-fg-soft" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-fg-soft" />
+                          <ChevronDown className="w-4 h-4 text-fg-soft" />
                         )}
                       </div>
                     )}
@@ -103,14 +106,14 @@ export function NavMain({
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton
                             asChild
-                            className="p-2.5 bg-bg-surface1 rounded inline-flex justify-start items-center gap-1.5 overflow-hidden hover:bg-bg-surface3"
+                            className="self-stretch h-10 p-2.5 bg-bg-surface1 rounded-sm inline-flex justify-start items-center gap-1.5 overflow-hidden hover:bg-bg-surface3"
                           >
                             <a
                               href={subItem.url}
                               className="flex items-center gap-1.5 w-full"
                             >
                               <div className="w-5 h-5" />
-                              <span className="flex-1 text-fg-soft text-sm font-medium truncate">
+                              <span className="flex-1 text-fg-soft text-sm font-medium leading-tight truncate">
                                 {subItem.title}
                               </span>
                             </a>

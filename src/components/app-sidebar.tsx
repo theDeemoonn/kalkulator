@@ -1,6 +1,9 @@
 'use client';
 
+import Heart from '@/components/icon/heart';
+import History from '@/components/icon/history';
 import LogoComponent from '@/components/icon/logo';
+import Home from '@/components/icon/side-bar-home-Icon';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { TeamSwitcher } from '@/components/team-switcher';
@@ -11,7 +14,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import { Frame, Heart, History, Home, Map, PieChart } from 'lucide-react';
+import { Frame, Map, PieChart } from 'lucide-react';
 import * as React from 'react';
 
 // This is sample data.
@@ -124,17 +127,17 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" className="w-[236px]" {...props}>
-      <div className="flex flex-col h-full bg-bg-surface2  gap-0.5 group-data-[collapsible=icon]:gap-0.5">
-        <SidebarHeader className="pr-2.5 py-2.5 bg-bg-surface1 rounded inline-flex justify-start items-center overflow-hidden">
+    <Sidebar collapsible="icon" className="w-[246px]" {...props}>
+      <div className="flex flex-col h-full  bg-bg-surface2 gap-0.5 group-data-[collapsible=icon]:gap-0.5">
+        <SidebarHeader className="group-data-[collapsible=icon]:p-0.5 px-3 bg-bg-surface1 rounded inline-flex justify-start items-center overflow-hidden">
           <TeamSwitcher teams={data.teams} />
         </SidebarHeader>
 
-        <SidebarContent className="flex-1 bg-bg-surface1 rounded p-2 gap-1.5 overflow-hidden">
+        <SidebarContent className="flex-1 bg-bg-surface1 rounded p-3 gap-1.5 overflow-hidden group-data-[collapsible=icon]:p-1">
           <NavMain items={data.navMain} />
         </SidebarContent>
 
-        <SidebarFooter className="bg-bg-surface1 rounded p-2.5 mt-0">
+        <SidebarFooter className="bg-bg-surface1 rounded mt-0 group-data-[collapsible=icon]:p-1">
           <NavUser user={data.user} />
         </SidebarFooter>
       </div>

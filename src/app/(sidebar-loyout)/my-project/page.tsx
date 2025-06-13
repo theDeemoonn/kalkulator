@@ -11,9 +11,8 @@ import {
   PageContent,
   PageHeader,
   PageTableContainer,
-  PageTitle,
 } from '@/components/page-container';
-import { TypographyBodyM } from '@/components/typography';
+import { TypographyBodyM, TypographyH2 } from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -203,7 +202,7 @@ function ProjectsPage() {
         <PageContainer>
           {/* Headers */}
           <PageHeader>
-            <PageTitle>Мои проекты</PageTitle>
+            <TypographyH2>Мои проекты</TypographyH2>
           </PageHeader>
 
           {/* Actions container */}
@@ -246,12 +245,12 @@ function ProjectsPage() {
             </Button>
           </PageActions>
 
-          <PageContent>
+          <PageContent className="py-1">
             {/* Header container */}
             <div className="px-4 flex flex-col justify-start items-start">
               <div className="w-full h-10 pl-10 inline-flex justify-start items-start">
                 {/* Project name column */}
-                <div className="flex-1 px-1 py-2.5 flex justify-start items-start gap-1">
+                <div className="flex-1  flex justify-start items-start gap-1">
                   {sortState === 'none' ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -290,21 +289,21 @@ function ProjectsPage() {
                 </div>
                 {/* Project info columns */}
                 <div className="flex-1 flex justify-between items-center">
-                  <div className="w-36 px-1 py-2.5 flex justify-start items-center gap-1.5">
-                    <div className="px-1.5 rounded flex justify-start items-center gap-1">
+                  <div className="w-36 flex justify-start items-center gap-1.5">
+                    <div className=" rounded flex justify-start items-center gap-1">
                       <span className="text-fg-soft text-sm font-medium">
                         Обновлен
                       </span>
                     </div>
                   </div>
-                  <div className="w-36 px-1 py-2.5 flex justify-start items-center gap-1.5">
-                    <div className="px-1.5 rounded flex justify-start items-center gap-1">
+                  <div className="w-36 flex justify-start items-center gap-1.5">
+                    <div className=" rounded flex justify-start items-center gap-1">
                       <span className="text-fg-soft text-sm font-medium">
                         Расчеты
                       </span>
                     </div>
                   </div>
-                  <div className="w-24 py-2.5 flex justify-start items-center gap-1.5">
+                  <div className="w-24  flex justify-start items-center gap-1.5">
                     <span className="text-fg-soft text-sm font-medium">
                       Действия
                     </span>
@@ -315,7 +314,7 @@ function ProjectsPage() {
 
             {/* Project list */}
             <PageTableContainer>
-              <div className="flex flex-col justify-start items-start">
+              <div className="flex flex-col justify-start items-start gap-4">
                 {filteredProjects.map((project) => (
                   <div
                     key={project.id}
@@ -333,7 +332,7 @@ function ProjectsPage() {
                             <Button
                               variant="ghost"
                               onClick={() => toggleFavorite(project.id)}
-                              className="p-2.5 absolute left-0 top-0 rounded inline-flex justify-center items-center hover:bg-transparent h-auto"
+                              className="py-1 px-2.5 absolute left-0 top-0 rounded inline-flex justify-center items-center hover:bg-transparent h-auto"
                             >
                               {project.isFavorite ? <HeartFilled /> : <Heart />}
                             </Button>
@@ -350,7 +349,7 @@ function ProjectsPage() {
                     </div>
 
                     {/* Project name */}
-                    <div className="flex-1 p-2.5 inline-flex flex-col justify-start items-start gap-1">
+                    <div className="flex-1 px-2 inline-flex flex-col justify-start items-start gap-1">
                       <div className="w-full text-fg-default text-base font-bold">
                         {project.name}
                       </div>
@@ -360,9 +359,9 @@ function ProjectsPage() {
                     </div>
 
                     {/* Project info */}
-                    <div className="flex-1 flex justify-between items-center">
+                    <div className="flex-1 flex justify-between items-start">
                       {/* Update info */}
-                      <div className="w-36 px-1 py-1 flex justify-start items-center gap-1.5">
+                      <div className="w-36 flex justify-start items-center gap-1.5">
                         <span className="text-fg-soft text-sm font-medium">
                           {project.updatedAt}
                         </span>
@@ -372,7 +371,7 @@ function ProjectsPage() {
                       </div>
 
                       {/* Counter */}
-                      <div className="p-2.5 flex justify-start items-center gap-1.5">
+                      <div className="flex justify-start items-center gap-1.5">
                         <span className="w-32 text-fg-soft text-sm font-medium">
                           {project.calculationsCount}
                         </span>

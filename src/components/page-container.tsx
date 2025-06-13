@@ -10,7 +10,7 @@ function PageContainer({
   return (
     <div
       className={cn(
-        'flex flex-col flex-1 bg-bg-surface1 rounded overflow-hidden p-2.5',
+        'flex flex-col flex-1 bg-bg-surface1 rounded overflow-hidden',
         className
       )}
       {...props}
@@ -29,7 +29,7 @@ function PageHeader({
   return (
     <div
       className={cn(
-        'px-6 py-7 flex justify-between items-center gap-2.5 border-b border-border-soft',
+        'px-6 py-7.5 mt-2 flex justify-between items-center gap-2.5 border-b border-border-soft',
         className
       )}
       {...props}
