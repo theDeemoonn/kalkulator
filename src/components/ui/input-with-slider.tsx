@@ -32,17 +32,11 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
   onChange,
   onInfoClick,
   error,
-  label,
   disabled,
   className,
 }) => {
   const handleSliderChange = (val: number[]) => {
     if (val[0] !== value) onChange(val[0]);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const num = Number(e.target.value);
-    if (!isNaN(num)) onChange(num);
   };
 
   return (

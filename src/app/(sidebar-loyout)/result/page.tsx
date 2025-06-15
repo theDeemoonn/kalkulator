@@ -83,9 +83,6 @@ function ResultPage() {
   const [rightActiveTab, setRightActiveTab] = useState('document');
 
   // Состояние для редактирования заголовка проекта
-  const [projectTitle, setProjectTitle] = useState<string>('Без названия');
-  const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
-  const [titleEditValue, setTitleEditValue] = useState<string>('');
 
   const [soilLayers, setSoilLayers] = useState<SoilLayer[]>([
     {
@@ -187,31 +184,7 @@ function ResultPage() {
   ]);
 
   // Функции для редактирования заголовка проекта
-  const startEditingTitle = () => {
-    setIsEditingTitle(true);
-    setTitleEditValue(projectTitle);
-  };
-
-  const saveTitleEdit = () => {
-    if (titleEditValue.trim()) {
-      setProjectTitle(titleEditValue.trim());
-    }
-    setIsEditingTitle(false);
-    setTitleEditValue('');
-  };
-
-  const cancelTitleEdit = () => {
-    setIsEditingTitle(false);
-    setTitleEditValue('');
-  };
-
-  const handleTitleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      saveTitleEdit();
-    } else if (e.key === 'Escape') {
-      cancelTitleEdit();
-    }
-  };
+  const startEditingTitle = () => {};
 
   const saveEdit = (tabId: string) => {
     if (editingValue.trim()) {
