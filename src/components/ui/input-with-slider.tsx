@@ -1,11 +1,10 @@
 import { cn } from '@/lib/utils';
 import * as React from 'react';
-import { Input } from './input';
 import { Slider } from './slider';
 
 // Типы пропсов
 export type InputWithSliderProps = {
-  measure: string;
+  measure: string | React.ReactNode;
   title: string;
   subtitle?: string;
   value: number;
@@ -47,10 +46,10 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
   };
 
   return (
-    <div className={cn('relative flex flex-col gap-1.5 w-56', className)}>
+    <div className={cn('relative flex flex-col gap-1.5 h-[86px]', className)}>
       <div
         className={cn(
-          'bg-bg-surface1 rounded-sm outline outline-1 outline-offset-[-1px] outline-border-hard flex flex-col gap-0.5 overflow-hidden px-1.5 pt-2.5 pb-1.5',
+          'bg-bg-surface1 rounded-sm outline outline-offset-[-1px] outline-border-hard flex flex-col gap-0.5 overflow-hidden px-1.5 pt-2.5 pb-1.5',
           error && 'outline-destructive'
         )}
       >
@@ -95,7 +94,7 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
           </button>
         </div>
         {/* Нижняя секция */}
-        <div className="flex p-1 bg-bg-surface1 rounded-sm items-center gap-1.5">
+        <div className="flex bg-bg-surface1 rounded-sm items-center gap-1.5">
           <div className="flex-1 flex items-center gap-1.5">
             <div className="text-fg-default text-sm font-medium leading-tight select-none">
               {value}
@@ -104,21 +103,10 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
               {unit}
             </div>
           </div>
-          <Input
-            type="number"
-            min={min}
-            max={max}
-            step={step}
-            value={value}
-            onChange={handleInputChange}
-            disabled={disabled}
-            aria-label={label || title}
-            className="w-20 h-8 text-right px-2 py-1 text-base border border-border-hard rounded focus-visible:border-accent-default focus-visible:ring-accent-default/50 focus-visible:ring-2"
-          />
         </div>
       </div>
       {/* Слайдер снизу */}
-      <div className="relative left-0 right-0 bottom-3.5 w-full px-2.5 flex items-center h-3.5">
+      <div className="absolute left-0 right-0 bottom-1 w-full px-2.5 flex items-center h-3.5">
         <Slider
           min={min}
           max={max}

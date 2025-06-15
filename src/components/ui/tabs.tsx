@@ -24,7 +24,7 @@ function TabsList({
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
-      className={cn('inline-flex w-fit items-center gap-2 p-1', className)}
+      className={cn('inline-flex w-fit items-center p-1', className)}
       {...props}
     />
   );
@@ -41,10 +41,10 @@ function TabsTrigger({
         // Базовые стили (как у кнопки)
         'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none',
         // Стандартные размеры
-        'h-10 gap-1.5 px-2.5 rounded',
+        'h-10 gap-1.5 px-2 rounded',
         // Состояния
         'text-muted-foreground hover:text-foreground hover:bg-muted',
-        'data-[state=active]:bg-background data-[state=active]:text-red-600 data-[state=active]:shadow-sm',
+        'data-[state=active]:bg-background data-[state=active]:text-accent-default data-[state=active]:shadow-sm',
         // Фокус
         'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         // Иконки
