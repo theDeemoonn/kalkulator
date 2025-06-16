@@ -34,7 +34,7 @@ export function LoginForm({
               </div>
               <div className="grid gap-3">
                 <Input
-                  prefix={'Почта'}
+                  prefix={<TypographyBodyM>Почта</TypographyBodyM>}
                   suffix={<EmailIcon />}
                   id="email"
                   type="email"
@@ -43,7 +43,7 @@ export function LoginForm({
               </div>
               <div className="grid gap-3">
                 <Input
-                  prefix={'Пароль'}
+                  prefix={<TypographyBodyM>Пароль</TypographyBodyM>}
                   suffix={<PasswordEye />}
                   id="password"
                   type="password"

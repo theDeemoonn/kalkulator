@@ -1,16 +1,52 @@
+'use client';
 import { cn } from '@/lib/utils';
 import * as React from 'react';
+
+interface InputProps extends Omit<React.ComponentProps<'input'>, 'prefix'> {
+  prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
+}
 
 function Input({
   className,
   type,
   prefix,
   suffix,
+  value,
+  defaultValue,
+  onChange,
   ...props
-}: React.ComponentProps<'input'> & {
-  prefix?: string | React.ReactNode;
-  suffix?: string | React.ReactNode;
-}) {
+}: InputProps) {
+  const [internalValue, setInternalValue] = React.useState(defaultValue || '');
+  const [isFocused, setIsFocused] = React.useState(false);
+
+  // Определяем, есть ли значение в input
+  const hasValue = React.useMemo(() => {
+    if (value !== undefined) {
+      return String(value).length > 0;
+    }
+    return String(internalValue).length > 0;
+  }, [value, internalValue]);
+
+  // Показывать ли prefix
+  const showPrefix = !hasValue && !isFocused;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (value === undefined) {
+      setInternalValue(e.target.value);
+    }
+    onChange?.(e);
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    props.onFocus?.(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    props.onBlur?.(e);
+  };
   if (prefix || suffix) {
     return (
       <div
@@ -21,23 +57,35 @@ function Input({
         )}
       >
         {prefix && (
-          <span className="flex items-center pl-2.5 pr-1 text-fg-default select-none text-[16px] leading-[120%] tracking-[-0.01em] font-semibold">
+          <span
+            className={cn(
+              'flex items-center pl-2.5 pr-1 text-fg-soft select-none text-[16px] leading-[120%] tracking-[-0.01em] font-semibold transition-all duration-200 ease-in-out',
+              showPrefix
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 -translate-x-2 pointer-events-none'
+            )}
+          >
             {prefix}
           </span>
         )}
         <input
           type={type}
+          value={value}
+          defaultValue={defaultValue}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           data-slot="input"
           className={cn(
             'file:text-foreground placeholder:text-fg-soft selection:bg-accent-default selection:text-accent-on-accent flex-1 bg-transparent border-0 outline-none file:inline-flex file:h-7 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
-            prefix ? 'pl-0' : 'pl-2.5',
+            showPrefix ? 'pl-0' : 'pl-2.5',
             suffix ? 'pr-0' : 'pr-2.5',
-            'py-2.5'
+            'py-2.5 transition-all duration-200 ease-in-out'
           )}
           {...props}
         />
         {suffix && (
-          <span className="flex items-center pr-2.5 pl-1 text-fg-default select-none">
+          <span className="flex items-center pr-2.5 pl-1 text-fg-soft select-none">
             {suffix}
           </span>
         )}
