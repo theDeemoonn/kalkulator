@@ -6,11 +6,16 @@ import {
   PageContent,
   PageHeader,
 } from '@/components/page-container';
-import { TypographyBodyM, TypographyMuted } from '@/components/typography';
+import {
+  TypographyBodyM,
+  TypographyBodyS,
+  TypographyH2,
+  TypographyMuted,
+} from '@/components/typography';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputWithControls } from '@/components/ui/input-with-controls';
-import { Label } from '@/components/ui/label';
+import { InputWithSlider } from '@/components/ui/input-with-slider';
 import {
   Select,
   SelectContent,
@@ -55,7 +60,7 @@ interface SoilLayer {
 
 function DashboardPage() {
   const [tabs, setTabs] = useState<Tab[]>([
-    { id: '1', name: 'Исходные', isEditing: false },
+    { id: '1', name: 'Исходные данные', isEditing: false },
   ]);
   const [activeTab, setActiveTab] = useState<string>('1');
   const [editingValue, setEditingValue] = useState<string>('');
@@ -348,15 +353,11 @@ function DashboardPage() {
     setEditingValue('');
   };
 
-  const handleInfoClick = () => {
-    alert('Показать справку или дополнительную информацию');
-  };
-
   return (
     <SidebarInset>
       <PageContainer className="p-0">
         {/* Header с табами */}
-        <PageHeader>
+        <PageHeader className="py-6 mt-0">
           <div className="flex items-center gap-2 flex-1">
             <Tabs
               value={activeTab}
@@ -400,9 +401,7 @@ function DashboardPage() {
                       ) : (
                         <>
                           <TabsTrigger value={tab.id} className="pr-12 min-w-0">
-                            <span className="truncate max-w-[100px]">
-                              {tab.name}
-                            </span>
+                            <TypographyBodyM> {tab.name}</TypographyBodyM>
                           </TabsTrigger>
 
                           <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
@@ -490,7 +489,7 @@ function DashboardPage() {
                         </Button>
                       </div>
                     ) : (
-                      <h1 className="text-3xl font-semibold">{projectTitle}</h1>
+                      <TypographyH2>{projectTitle}</TypographyH2>
                     )}
 
                     {!isEditingTitle && (
@@ -544,9 +543,11 @@ function DashboardPage() {
                   </div>
 
                   {/* Первая строка с выпадающими списками */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-w-0">
                     <div className="space-y-2">
-                      <Label htmlFor="compaction">Тип уплотнения грунта</Label>
+                      <TypographyBodyS className="text-fg-soft">
+                        Тип уплотнения грунта
+                      </TypographyBodyS>
                       <Select
                         value={calculationParams.compactionType}
                         onValueChange={(value) =>
@@ -570,7 +571,9 @@ function DashboardPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="lateral">Боковое давление грунта</Label>
+                      <TypographyBodyS className="text-fg-soft">
+                        Боковое давление грунта
+                      </TypographyBodyS>
                       <Select
                         value={calculationParams.lateralPressure}
                         onValueChange={(value) =>
@@ -591,7 +594,9 @@ function DashboardPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="water">Учет давления воды</Label>
+                      <TypographyBodyS className="text-fg-soft">
+                        Учет давления воды
+                      </TypographyBodyS>
                       <Select
                         value={calculationParams.waterPressure}
                         onValueChange={(value) =>
@@ -612,7 +617,9 @@ function DashboardPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="assignment">Вид задания грунта</Label>
+                      <TypographyBodyS className="text-fg-soft">
+                        Вид задания грунта
+                      </TypographyBodyS>
                       <Select
                         value={calculationParams.soilAssignment}
                         onValueChange={(value) =>
@@ -636,7 +643,7 @@ function DashboardPage() {
                   </div>
 
                   {/* Вторая строка с числовыми полями */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-w-0">
                     <InputWithControls
                       label="Отметка верха геологии"
                       value={calculationParams.topMark.a}
@@ -730,8 +737,8 @@ function DashboardPage() {
                     <div className="text-xl font-bold">
                       Характеристики грунтов
                     </div>
-                    <div className="rounded-lg overflow-x-auto max-w-full relative">
-                      <div className="w-full" style={{ paddingLeft: '36px' }}>
+                    <div className="rounded-lg overflow-visible max-w-full relative">
+                      <div className="w-full">
                         {/* Заголовок */}
                         <div className="flex bg-bg-surface2 rounded-t-lg">
                           {/* ИГЭ */}
@@ -845,7 +852,7 @@ function DashboardPage() {
                           >
                             {/* Hover область слева с кнопками */}
                             {hoveredRow === layer.id && (
-                              <div className="absolute left-[-36px] top-0 h-12 w-auto px-2 bg-bg-surface4 rounded-l-md flex items-center justify-center gap-1 z-10 border-r-0 border-border-hard2">
+                              <div className="absolute left-[-20px] top-0 h-12 w-auto px-2 bg-bg-surface4 rounded-l-md flex items-center justify-center gap-1 z-20 border-r-0 border-border-hard2">
                                 {/* Иконка для перетаскивания */}
                                 <div
                                   className="cursor-move p-1 hover:bg-bg-surface5 rounded"
@@ -998,90 +1005,74 @@ function DashboardPage() {
                 </TooltipProvider>
 
                 {/* Параметры котлована */}
-                <div className="p-6 space-y-6">
+                <div className="p-6">
                   <div className="space-y-2">
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-semibold py-6">
                       Параметры котлована
                     </h2>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <InputWithControls
-                      placeholder={'Введите значение (м)'}
-                      measure="h"
+                  <div className="grid grid-cols-1 md:grid-cols-4  gap-4">
+                    <InputWithSlider
+                      measure={
+                        <>
+                          h<sub>w</sub>
+                        </>
+                      }
                       title="Уровень грунтовых вод"
                       value={groundwaterLevel}
-                      suffix="м"
+                      unit="м"
                       min={0}
                       max={500}
+                      step={1}
                       onChange={(value) => setGroundwaterLevel(Number(value))}
-                      onInfoClick={handleInfoClick}
-                      showInfoButton={true}
-                      showSlider={true}
-                      type="number"
-                      size="md"
                     />
                     {/* Угол наклона поверхности грунта */}
-                    <InputWithControls
-                      placeholder={'Введите значение (°)'}
+                    <InputWithSlider
                       measure="β"
                       title="Угол наклона поверхности грунта"
                       value={slopeAngle}
-                      suffix="°"
+                      unit="°"
                       min={0}
                       max={90}
                       step={1}
                       onChange={(value) => setSlopeAngle(Number(value))}
-                      onInfoClick={handleInfoClick}
-                      showInfoButton={true}
-                      showSlider={true}
-                      type="number"
-                      size="md"
                     />
 
                     {/* Глубина котлована */}
-                    <InputWithControls
-                      placeholder={'Введите значение (м)'}
+
+                    <InputWithSlider
                       measure="H"
                       title="Глубина котлована"
                       value={pitDepth}
-                      suffix="м"
+                      unit="м"
                       min={0}
-                      max={200}
-                      step={1}
+                      max={50}
+                      step={0.1}
                       onChange={(value) => setPitDepth(Number(value))}
-                      type="number"
-                      size="md"
                     />
 
                     {/* Длина ограждения */}
-                    <InputWithControls
-                      placeholder={'Введите значение (м)'}
+
+                    <InputWithSlider
                       measure="L"
                       title="Длина ограждения"
                       value={fenceLength}
-                      suffix="м"
+                      unit="м"
                       min={0}
                       max={100}
-                      step={1}
+                      step={0.1}
                       onChange={(value) => setFenceLength(Number(value))}
-                      type="number"
-                      size="md"
                     />
-                  </div>
-                  <div className="mt-6 max-w-xs">
-                    <InputWithControls
+                    <InputWithSlider
                       measure=""
                       title="Глубина заделки"
                       value={embedmentDepth}
-                      suffix="м"
+                      unit="м"
                       min={0}
-                      max={100}
+                      max={50}
+                      step={0.1}
                       onChange={(value) => setEmbedmentDepth(Number(value))}
-                      onInfoClick={handleInfoClick}
-                      showInfoButton={true}
-                      showSlider={true}
-                      type="number"
-                      size="md"
+                      disabled
                     />
                   </div>
                 </div>

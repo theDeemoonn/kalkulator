@@ -43,7 +43,8 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
     <div className={cn('relative flex flex-col gap-1.5 h-[86px]', className)}>
       <div
         className={cn(
-          'bg-bg-surface1 rounded-sm outline outline-offset-[-1px] outline-border-hard flex flex-col gap-0.5 overflow-hidden px-1.5 pt-2.5 pb-1.5',
+          'flex-1 rounded-sm outline outline-offset-[-1px] outline-border-hard flex flex-col gap-0.5 overflow-hidden px-1.5 pt-2.5 pb-1.5',
+          disabled ? 'bg-bg-surface3' : 'bg-bg-surface1',
           error && 'outline-destructive'
         )}
       >
@@ -88,7 +89,13 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
           </button>
         </div>
         {/* Нижняя секция */}
-        <div className="flex bg-bg-surface1 rounded-sm items-center gap-1.5">
+        <div
+          className={cn(
+            'flex bg-bg-surface1 rounded-sm items-center gap-1.5',
+            disabled ? 'bg-bg-surface3' : 'bg-bg-surface1',
+            error && 'outline-destructive'
+          )}
+        >
           <div className="flex-1 flex items-center gap-1.5">
             <div className="text-fg-default text-sm font-medium leading-tight select-none">
               {value}
@@ -99,23 +106,19 @@ export const InputWithSlider: React.FC<InputWithSliderProps> = ({
           </div>
         </div>
       </div>
-      {/* Слайдер снизу */}
-      <div className="absolute left-0 right-0 bottom-1 w-full px-2.5 flex items-center h-3.5">
-        <Slider
-          min={min}
-          max={max}
-          step={step}
-          value={[value]}
-          onValueChange={handleSliderChange}
-          disabled={disabled}
-          className="flex-1 h-0.5 bg-border-hard2"
-        />
-        <div
-          tabIndex={0}
-          aria-label="Перетащить"
-          role="button"
-          className="ml-2 flex items-center justify-center cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-default rounded"
-        ></div>
+      {/* Слайдер внизу контейнера */}
+      <div className="absolute left-2.5 right-2.5 bottom-[0px]">
+        {!disabled && (
+          <Slider
+            min={min}
+            max={max}
+            step={step}
+            value={[value]}
+            onValueChange={handleSliderChange}
+            disabled={disabled}
+            className="w-full"
+          />
+        )}
       </div>
     </div>
   );

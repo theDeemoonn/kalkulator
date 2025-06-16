@@ -450,7 +450,7 @@ function ResultPage() {
                         </PageHeader>
 
                         <TabsContent value="excavation" className="space-y-6">
-                          <PageContent className="py-8.5 px-6">
+                          <PageContent className="py-8.5 pl-6 pr-0.5">
                             {/* Характеристики грунтов */}
                             <div className="space-y-4">
                               <div className="flex items-center justify-between pb-6">
@@ -458,6 +458,7 @@ function ResultPage() {
                                   Характеристики грунтов
                                 </TypographyH4>
                                 <Button
+                                  className="mr-6"
                                   variant="ghost"
                                   size="sm"
                                   onClick={addSoilLayer}
@@ -484,7 +485,7 @@ function ResultPage() {
                                 Параметры котлована
                               </TypographyH4>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-6">
                                 <InputWithSlider
                                   measure={
                                     <>
@@ -603,7 +604,7 @@ function ResultPage() {
                               <TypographyH4 className="py-10.5">
                                 Ограждение
                               </TypographyH4>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-6">
                                 <InputWithSlider
                                   measure="γ"
                                   title="Контакт с грунтом"
@@ -870,9 +871,10 @@ function ResultPage() {
 
                         <div className="flex justify-center">
                           <Button
+                            className="bg-bg-surface2"
                             size={'full'}
                             leftIcon={<FightningFilled className=" h-4 w-4" />}
-                            variant="outline"
+                            variant="ghost"
                             disabled
                           >
                             Рассчитать

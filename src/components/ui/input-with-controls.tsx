@@ -111,7 +111,7 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
       aria-label="Информация"
       onClick={onInfoClick}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onInfoClick?.()}
-      className="relative outline-none focus-visible:ring-2 focus-visible:ring-accent-default rounded"
+      className="outline-none focus-visible:ring-2 focus-visible:ring-accent-default rounded"
       role="button"
     >
       <InfoSquare className="w-4 h-4" />
@@ -151,22 +151,24 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
               )}
             </div>
             <div className="flex-1 flex items-center justify-center text-fg-soft text-sm font-medium leading-tight">
-              {title}
+              <span className="truncate">{title}</span>
             </div>
             {showInfoButton && <InfoButton />}
           </div>
 
-          {/* Нижняя секция */}
+          {/* Нижняя секция с инпутом */}
           <div className="flex p-1 bg-bg-surface1 rounded-sm items-center gap-1.5">
             <div className="flex-1 flex items-center gap-1.5">
               {!value && value == 0 ? (
-                <div className="text-fg-default text-sm font-medium leading-tight select-none">
-                  <TypographyMuted>{placeholder}</TypographyMuted>
+                <div className="text-fg-default text-sm font-medium leading-tight select-none flex-1 min-w-0">
+                  <TypographyMuted className="truncate">
+                    {placeholder}
+                  </TypographyMuted>
                 </div>
               ) : (
                 <>
                   {prefix && (
-                    <div className="text-fg-default text-sm font-medium leading-tight select-none">
+                    <div className="text-fg-default text-sm font-medium leading-tight select-none truncate">
                       {prefix}
                     </div>
                   )}
@@ -218,17 +220,23 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
 
   return (
     <div className={cn('space-y-2', styles.container, className)}>
-      {label && (
-        <div className="flex justify-between items-center">
-          <Label className="leading-none h-[18px] flex items-center">
-            <TypographyBodyS className="text-fg-soft">{label}</TypographyBodyS>
-          </Label>
+      {(label || showInfoButton) && (
+        <div className="flex justify-between items-center gap-2">
+          {label ? (
+            <Label className="leading-none h-[18px] flex items-center flex-1 min-w-0">
+              <TypographyBodyS className="text-fg-soft truncate">
+                {label}
+              </TypographyBodyS>
+            </Label>
+          ) : (
+            <div className="flex-1" />
+          )}
           {showInfoButton && <InfoButton />}
         </div>
       )}
 
       <div className="flex gap-2">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-1">
           <Input
             type={type}
             min={type === 'number' ? min : undefined}
@@ -246,9 +254,9 @@ export const InputWithControls: React.FC<InputWithControlsProps> = ({
         </div>
       </div>
 
-      {/* Слайдер для простого режима - исправлена ширина */}
+      {/* Слайдер для простого режима */}
       {showSlider && type === 'number' && (
-        <div className="relative  left-0 right-0 bottom-4 w-full px-2.5 flex items-center h-3.5">
+        <div className="relative left-0 right-0 bottom-4 w-full px-2.5 flex items-center h-3.5">
           <Slider
             min={min}
             max={max}
